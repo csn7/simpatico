@@ -1,0 +1,880 @@
+diff -crN vecmath-c++-1.2-1.4/Point2.h vecmath-c++-1.2-1.4-modified/Point2.h
+*** vecmath-c++-1.2-1.4/Point2.h	1999-10-06 11:52:48.000000000 +0900
+--- vecmath-c++-1.2-1.4-modified/Point2.h	2011-03-29 20:09:06.000000000 +0900
+***************
+*** 77,84 ****
+        * @param  p1 the other point
+        */
+      T distanceSquared(const Point2& p1) const {
+!         T dx = x - p1.x;
+!         T dy = y - p1.y;
+          return dx*dx + dy*dy;
+      }
+  
+--- 77,84 ----
+        * @param  p1 the other point
+        */
+      T distanceSquared(const Point2& p1) const {
+!         T dx = this->x - p1.x;
+!         T dy = this->y - p1.y;
+          return dx*dx + dy*dy;
+      }
+  
+***************
+*** 96,102 ****
+        * @param p1 the other point
+        */
+      T distanceL1(const Point2& p1) const {
+!         return VmUtil<T>::abs(x-p1.x) + VmUtil<T>::abs(y-p1.y);
+      }
+  
+      /**
+--- 96,102 ----
+        * @param p1 the other point
+        */
+      T distanceL1(const Point2& p1) const {
+!         return VmUtil<T>::abs(this->x-p1.x) + VmUtil<T>::abs(this->y-p1.y);
+      }
+  
+      /**
+***************
+*** 105,111 ****
+        * @param p1 the other point
+        */
+      T distanceLinf(const Point2& p1) const {
+!         return VmUtil<T>::max(VmUtil<T>::abs(x-p1.x), VmUtil<T>::abs(y-p1.y));
+      }
+  
+      // copy constructor and operator = is made by complier
+--- 105,111 ----
+        * @param p1 the other point
+        */
+      T distanceLinf(const Point2& p1) const {
+!         return VmUtil<T>::max(VmUtil<T>::abs(this->x-p1.x), VmUtil<T>::abs(this->y-p1.y));
+      }
+  
+      // copy constructor and operator = is made by complier
+diff -crN vecmath-c++-1.2-1.4/Point3.h vecmath-c++-1.2-1.4-modified/Point3.h
+*** vecmath-c++-1.2-1.4/Point3.h	1999-10-06 11:52:48.000000000 +0900
+--- vecmath-c++-1.2-1.4-modified/Point3.h	2011-03-29 20:09:06.000000000 +0900
+***************
+*** 80,88 ****
+        * @return the square of distance between these two points as a float
+        */
+      T distanceSquared(const Point3& p1) const {
+!         T dx = x - p1.x;
+!         T dy = y - p1.y;
+!         T dz = z - p1.z;
+          return dx*dx + dy*dy + dz*dz;
+      }
+  
+--- 80,88 ----
+        * @return the square of distance between these two points as a float
+        */
+      T distanceSquared(const Point3& p1) const {
+!         T dx = this->x - p1.x;
+!         T dy = this->y - p1.y;
+!         T dz = this->z - p1.z;
+          return dx*dx + dy*dy + dz*dz;
+      }
+  
+***************
+*** 101,107 ****
+        * @param p1 the other point
+        */
+      T distanceL1(const Point3& p1) const {
+!         return VmUtil<T>::abs(x-p1.x) + VmUtil<T>::abs(y-p1.y) + VmUtil<T>::abs(z-p1.z);
+      }
+  
+      /**
+--- 101,107 ----
+        * @param p1 the other point
+        */
+      T distanceL1(const Point3& p1) const {
+!         return VmUtil<T>::abs(this->x-p1.x) + VmUtil<T>::abs(this->y-p1.y) + VmUtil<T>::abs(this->z-p1.z);
+      }
+  
+      /**
+***************
+*** 110,116 ****
+        * @param p1 the other point
+        */
+      T distanceLinf(const Point3& p1) const {
+!         return VmUtil<T>::max(VmUtil<T>::abs(x-p1.x), VmUtil<T>::abs(y-p1.y), VmUtil<T>::abs(z-p1.z));
+      }
+  
+      /**
+--- 110,116 ----
+        * @param p1 the other point
+        */
+      T distanceLinf(const Point3& p1) const {
+!         return VmUtil<T>::max(VmUtil<T>::abs(this->x-p1.x), VmUtil<T>::abs(this->y-p1.y), VmUtil<T>::abs(this->z-p1.z));
+      }
+  
+      /**
+***************
+*** 120,128 ****
+       */
+      void project(const Point4<T>& p1) {
+          // zero div may occur.
+!         x = p1.x/p1.w;
+!         y = p1.y/p1.w;
+!         z = p1.z/p1.w;
+      }
+  
+      // copy constructor and operator = is made by complier
+--- 120,128 ----
+       */
+      void project(const Point4<T>& p1) {
+          // zero div may occur.
+!         this->x = p1.x/p1.w;
+!         this->y = p1.y/p1.w;
+!         this->z = p1.z/p1.w;
+      }
+  
+      // copy constructor and operator = is made by complier
+diff -crN vecmath-c++-1.2-1.4/Point4.h vecmath-c++-1.2-1.4-modified/Point4.h
+*** vecmath-c++-1.2-1.4/Point4.h	1999-10-06 11:52:48.000000000 +0900
+--- vecmath-c++-1.2-1.4-modified/Point4.h	2011-03-29 20:09:06.000000000 +0900
+***************
+*** 96,105 ****
+       * @since Java3D 1.2
+       */
+      void set3(const Tuple3<T>& t1) {
+!         x = t1.x;
+!         y = t1.y;
+!         z = t1.z;
+!         w = 1;
+      }
+  
+      /**
+--- 96,105 ----
+       * @since Java3D 1.2
+       */
+      void set3(const Tuple3<T>& t1) {
+!         this->x = t1.x;
+!         this->y = t1.y;
+!         this->z = t1.z;
+!         this->w = 1;
+      }
+  
+      /**
+***************
+*** 108,117 ****
+        * @return the square of distance between this point and p1
+        */
+      T distanceSquared(const Point4& p1) const {
+!         T dx = x - p1.x;
+!         T dy = y - p1.y;
+!         T dz = z - p1.z;
+!         T dw = w - p1.w;
+          return dx*dx + dy*dy + dz*dz + dw*dw;
+      }
+  
+--- 108,117 ----
+        * @return the square of distance between this point and p1
+        */
+      T distanceSquared(const Point4& p1) const {
+!         T dx = this->x - p1.x;
+!         T dy = this->y - p1.y;
+!         T dz = this->z - p1.z;
+!         T dw = this->w - p1.w;
+          return dx*dx + dy*dy + dz*dz + dw*dw;
+      }
+  
+***************
+*** 132,139 ****
+        * @return L-1 distance
+        */
+      T distanceL1(const Point4& p1) const {
+!         return VmUtil<T>::abs(x-p1.x) + VmUtil<T>::abs(y-p1.y)
+! 	    + VmUtil<T>::abs(z-p1.z) + VmUtil<T>::abs(w-p1.w);
+      }
+  
+      /**
+--- 132,139 ----
+        * @return L-1 distance
+        */
+      T distanceL1(const Point4& p1) const {
+!         return VmUtil<T>::abs(this->x-p1.x) + VmUtil<T>::abs(this->y-p1.y)
+! 	    + VmUtil<T>::abs(this->z-p1.z) + VmUtil<T>::abs(this->w-p1.w);
+      }
+  
+      /**
+***************
+*** 143,149 ****
+        * @return L-infinite distance
+        */
+      T distanceLinf(const Point4& p1) const {
+!         return VmUtil<T>::max(VmUtil<T>::abs(x-p1.x), VmUtil<T>::abs(y-p1.y), VmUtil<T>::abs(z-p1.z), VmUtil<T>::abs(w-p1.w));
+      }
+  
+      /**
+--- 143,149 ----
+        * @return L-infinite distance
+        */
+      T distanceLinf(const Point4& p1) const {
+!         return VmUtil<T>::max(VmUtil<T>::abs(this->x-p1.x), VmUtil<T>::abs(this->y-p1.y), VmUtil<T>::abs(this->z-p1.z), VmUtil<T>::abs(this->w-p1.w));
+      }
+  
+      /**
+***************
+*** 154,163 ****
+        */
+       void project(const Point4& p1) {
+           // zero div may occur.
+!          x = p1.x/p1.w;
+!          y = p1.y/p1.w;
+!          z = p1.z/p1.w;
+!          w = 1;
+       }
+  
+      // copy constructor and operator = is made by complier
+--- 154,163 ----
+        */
+       void project(const Point4& p1) {
+           // zero div may occur.
+!          this->x = p1.x/p1.w;
+!          this->y = p1.y/p1.w;
+!          this->z = p1.z/p1.w;
+!          this->w = 1;
+       }
+  
+      // copy constructor and operator = is made by complier
+diff -crN vecmath-c++-1.2-1.4/Quat4.h vecmath-c++-1.2-1.4-modified/Quat4.h
+*** vecmath-c++-1.2-1.4/Quat4.h	1999-10-05 18:47:43.000000000 +0900
+--- vecmath-c++-1.2-1.4-modified/Quat4.h	2011-03-29 20:09:06.000000000 +0900
+***************
+*** 38,47 ****
+  void Quat4<T>::mul(const Quat4& q1) {
+      // store on stack for aliasing-safty
+      set(
+!         x*q1.w + w*q1.x + y*q1.z - z*q1.y,
+!         y*q1.w + w*q1.y + z*q1.x - x*q1.z,
+!         z*q1.w + w*q1.z + x*q1.y - y*q1.x,
+!         w*q1.w - x*q1.x - y*q1.y - z*q1.z
+          );
+  }
+  
+--- 38,47 ----
+  void Quat4<T>::mul(const Quat4& q1) {
+      // store on stack for aliasing-safty
+      set(
+!         this->x*q1.w + this->w*q1.x + this->y*q1.z - this->z*q1.y,
+!         this->y*q1.w + this->w*q1.y + this->z*q1.x - this->x*q1.z,
+!         this->z*q1.w + this->w*q1.z + this->x*q1.y - this->y*q1.x,
+!         this->w*q1.w - this->x*q1.x - this->y*q1.y - this->z*q1.z
+          );
+  }
+  
+***************
+*** 67,76 ****
+      n = 1/n;
+      // store on stack once for aliasing-safty
+      set(
+!         (x*q1.w - w*q1.x - y*q1.z + z*q1.y)*n,
+!         (y*q1.w - w*q1.y - z*q1.x + x*q1.z)*n,
+!         (z*q1.w - w*q1.z - x*q1.y + y*q1.x)*n,
+!         (w*q1.w + x*q1.x + y*q1.y + z*q1.z)*n
+          );
+  }
+  
+--- 67,76 ----
+      n = 1/n;
+      // store on stack once for aliasing-safty
+      set(
+!         (this->x*q1.w - this->w*q1.x - this->y*q1.z + this->z*q1.y)*n,
+!         (this->y*q1.w - this->w*q1.y - this->z*q1.x + this->x*q1.z)*n,
+!         (this->z*q1.w - this->w*q1.z - this->x*q1.y + this->y*q1.x)*n,
+!         (this->w*q1.w + this->x*q1.x + this->y*q1.y + this->z*q1.z)*n
+          );
+  }
+  
+***************
+*** 97,112 ****
+  
+  template<class T>
+  void Quat4<T>::set(const AxisAngle4<T>& a1) {
+! 	x = a1.x;
+! 	y = a1.y;
+! 	z = a1.z;
+! 	T n = VmUtil<T>::sqrt(x*x + y*y + z*z);
+  	// zero-div may occur.
+  	T s = VmUtil<T>::sin(0.5*a1.angle)/n;
+! 	x *= s;
+! 	y *= s;
+! 	z *= s;
+! 	w = VmUtil<T>::cos(0.5*a1.angle);
+  }
+  
+  
+--- 97,112 ----
+  
+  template<class T>
+  void Quat4<T>::set(const AxisAngle4<T>& a1) {
+! 	this->x = a1.x;
+! 	this->y = a1.y;
+! 	this->z = a1.z;
+! 	T n = VmUtil<T>::sqrt(this->x*this->x + this->y*this->y + this->z*this->z);
+  	// zero-div may occur.
+  	T s = VmUtil<T>::sin(0.5*a1.angle)/n;
+! 	this->x *= s;
+! 	this->y *= s;
+! 	this->z *= s;
+! 	this->w = VmUtil<T>::cos(0.5*a1.angle);
+  }
+  
+  
+***************
+*** 122,128 ****
+  	T w1 = q1.w/n1;
+  
+  	// t is cosine (dot product)
+! 	T t = x*x1 + y*y1 + z*z1 + w*w1;
+  
+  	// same quaternion (avoid domain error)
+  	if (1.0 <= VmUtil<T>::abs(t))
+--- 122,128 ----
+  	T w1 = q1.w/n1;
+  
+  	// t is cosine (dot product)
+! 	T t = this->x*x1 + this->y*y1 + this->z*z1 + this->w*w1;
+  
+  	// same quaternion (avoid domain error)
+  	if (1.0 <= VmUtil<T>::abs(t))
+***************
+*** 141,150 ****
+  	t = VmUtil<T>::sin(alpha*t)/sin_t;
+  
+  	// set values
+! 	x = s*x + t*x1;
+! 	y = s*y + t*y1;
+! 	z = s*z + t*z1;
+! 	w = s*w + t*w1;
+  }
+  
+  template<class T>
+--- 141,150 ----
+  	t = VmUtil<T>::sin(alpha*t)/sin_t;
+  
+  	// set values
+! 	this->x = s*this->x + t*x1;
+! 	this->y = s*this->y + t*y1;
+! 	this->z = s*this->z + t*z1;
+! 	this->w = s*this->w + t*w1;
+  }
+  
+  template<class T>
+***************
+*** 165,198 ****
+  	T tr = m00 + m11 + m22;
+  	if (tr >= 0.0) {
+  	    s = VmUtil<T>::sqrt(tr + 1.0);
+! 	    w = s*0.5;
+  	    s = 0.5/s;
+! 	    x = (m21 - m12)*s;
+! 	    y = (m02 - m20)*s;
+! 	    z = (m10 - m01)*s;
+  	} else {
+  	    T maxm = VmUtil<T>::max(m00, m11, m22);
+  	    if (maxm == m00) {
+              s = VmUtil<T>::sqrt(m00 - (m11 + m22) + 1.0);
+!             x = s*0.5;
+              s = 0.5/s;
+!             y = (m01 + m10)*s;
+!             z = (m20 + m02)*s;
+!             w = (m21 - m12)*s;
+  	    } else if (maxm == m11) {
+              s = VmUtil<T>::sqrt(m11 - (m22 + m00) + 1.0);
+!             y = s*0.5;
+              s = 0.5/s;
+!             z = (m12 + m21)*s;
+!             x = (m01 + m10)*s;
+!             w = (m02 - m20)*s;
+  	    } else {
+              s = VmUtil<T>::sqrt(m22 - (m00 + m11) + 1.0);
+!             z = s*0.5;
+              s = 0.5/s;
+!             x = (m20 + m02)*s;
+!             y = (m12 + m21)*s;
+!             w = (m10 - m01)*s;
+  	    }
+  	}
+  }
+--- 165,198 ----
+  	T tr = m00 + m11 + m22;
+  	if (tr >= 0.0) {
+  	    s = VmUtil<T>::sqrt(tr + 1.0);
+! 	    this->w = s*0.5;
+  	    s = 0.5/s;
+! 	    this->x = (m21 - m12)*s;
+! 	    this->y = (m02 - m20)*s;
+! 	    this->z = (m10 - m01)*s;
+  	} else {
+  	    T maxm = VmUtil<T>::max(m00, m11, m22);
+  	    if (maxm == m00) {
+              s = VmUtil<T>::sqrt(m00 - (m11 + m22) + 1.0);
+!             this->x = s*0.5;
+              s = 0.5/s;
+!             this->y = (m01 + m10)*s;
+!             this->z = (m20 + m02)*s;
+!             this->w = (m21 - m12)*s;
+  	    } else if (maxm == m11) {
+              s = VmUtil<T>::sqrt(m11 - (m22 + m00) + 1.0);
+!             this->y = s*0.5;
+              s = 0.5/s;
+!             this->z = (m12 + m21)*s;
+!             this->x = (m01 + m10)*s;
+!             this->w = (m02 - m20)*s;
+  	    } else {
+              s = VmUtil<T>::sqrt(m22 - (m00 + m11) + 1.0);
+!             this->z = s*0.5;
+              s = 0.5/s;
+!             this->x = (m20 + m02)*s;
+!             this->y = (m12 + m21)*s;
+!             this->w = (m10 - m01)*s;
+  	    }
+  	}
+  }
+diff -crN vecmath-c++-1.2-1.4/Quat4_.h vecmath-c++-1.2-1.4-modified/Quat4_.h
+*** vecmath-c++-1.2-1.4/Quat4_.h	1999-10-06 11:52:48.000000000 +0900
+--- vecmath-c++-1.2-1.4-modified/Quat4_.h	2011-03-29 20:09:06.000000000 +0900
+***************
+*** 118,127 ****
+       * @param q1 the source vector
+       */
+      void conjugate(const Quat4& q1) {
+!         x = -q1.x;
+!         y = -q1.y;
+!         z = -q1.z;
+!         w = q1.w;
+      }
+  
+      /**
+--- 118,127 ----
+       * @param q1 the source vector
+       */
+      void conjugate(const Quat4& q1) {
+!         this->x = -q1.x;
+!         this->y = -q1.y;
+!         this->z = -q1.z;
+!         this->w = q1.w;
+      }
+  
+      /**
+***************
+*** 129,137 ****
+       *  in place.
+       */
+      void conjugate() {
+!         x = -x;
+!         y = -y;
+!         z = -z;
+      }
+  
+      /**
+--- 129,137 ----
+       *  in place.
+       */
+      void conjugate() {
+!         this->x = -this->x;
+!         this->y = -this->y;
+!         this->z = -this->z;
+      }
+  
+      /**
+***************
+*** 170,176 ****
+  
+  protected:
+      T norm() const {
+!         return x*x + y*y + z*z + w*w;
+      }
+      void setFromMat(T m00, T m01, T m02,
+  		       T m10, T m11, T m12,
+--- 170,176 ----
+  
+  protected:
+      T norm() const {
+!         return this->x*this->x + this->y*this->y + this->z*this->z + this->w*this->w;
+      }
+      void setFromMat(T m00, T m01, T m02,
+  		       T m10, T m11, T m12,
+***************
+*** 184,193 ****
+      void inverse(const Quat4& q1) {
+          T n = q1.norm();
+          // zero-div may occur.
+!         x = -q1.x/n;
+!         y = -q1.y/n;
+!         z = -q1.z/n;
+!         w = q1.w/n;
+      }
+  
+      /**
+--- 184,193 ----
+      void inverse(const Quat4& q1) {
+          T n = q1.norm();
+          // zero-div may occur.
+!         this->x = -q1.x/n;
+!         this->y = -q1.y/n;
+!         this->z = -q1.z/n;
+!         this->w = q1.w/n;
+      }
+  
+      /**
+***************
+*** 196,205 ****
+      void inverse() {
+          T n = norm();
+          // zero-div may occur.
+!         x = -x/n;
+!         y = -y/n;
+!         z = -z/n;
+!         w /= n;
+      }
+  
+      /**
+--- 196,205 ----
+      void inverse() {
+          T n = norm();
+          // zero-div may occur.
+!         this->x = -this->x/n;
+!         this->y = -this->y/n;
+!         this->z = -this->z/n;
+!         this->w /= n;
+      }
+  
+      /**
+***************
+*** 210,219 ****
+      void normalize(const Quat4& q1) {
+          T n = VmUtil<T>::sqrt(q1.norm());
+          // zero-div may occur.
+!         x = q1.x/n;
+!         y = q1.y/n;
+!         z = q1.z/n;
+!         w = q1.w/n;
+      }
+  
+      /**
+--- 210,219 ----
+      void normalize(const Quat4& q1) {
+          T n = VmUtil<T>::sqrt(q1.norm());
+          // zero-div may occur.
+!         this->x = q1.x/n;
+!         this->y = q1.y/n;
+!         this->z = q1.z/n;
+!         this->w = q1.w/n;
+      }
+  
+      /**
+***************
+*** 222,231 ****
+      void normalize() {
+          T n = VmUtil<T>::sqrt(norm());
+          // zero-div may occur.
+!         x /= n;
+!         y /= n;
+!         z /= n;
+!         w /= n;
+      }
+  
+  #if 0
+--- 222,231 ----
+      void normalize() {
+          T n = VmUtil<T>::sqrt(norm());
+          // zero-div may occur.
+!         this->x /= n;
+!         this->y /= n;
+!         this->z /= n;
+!         this->w /= n;
+      }
+  
+  #if 0
+diff -crN vecmath-c++-1.2-1.4/Vector2.h vecmath-c++-1.2-1.4-modified/Vector2.h
+*** vecmath-c++-1.2-1.4/Vector2.h	1999-10-06 11:52:49.000000000 +0900
+--- vecmath-c++-1.2-1.4-modified/Vector2.h	2011-03-29 20:09:06.000000000 +0900
+***************
+*** 75,81 ****
+        * @param  v1 the other vector
+        */
+      T dot(const Vector2& v1) const {
+!         return x*v1.x + y*v1.y;
+      }
+  
+      /**
+--- 75,81 ----
+        * @param  v1 the other vector
+        */
+      T dot(const Vector2& v1) const {
+!         return this->x*v1.x + this->y*v1.y;
+      }
+  
+      /**
+***************
+*** 83,89 ****
+        * @return the squared length of this vector
+        */
+      T lengthSquared() const {
+!         return x*x + y*y;
+      }
+  
+      /**
+--- 83,89 ----
+        * @return the squared length of this vector
+        */
+      T lengthSquared() const {
+!         return this->x*this->x + this->y*this->y;
+      }
+  
+      /**
+***************
+*** 101,108 ****
+          T d = length();
+  
+          // zero-div may occur.
+!         x /= d;
+!         y /= d;
+      }
+  
+      /**
+--- 101,108 ----
+          T d = length();
+  
+          // zero-div may occur.
+!         this->x /= d;
+!         this->y /= d;
+      }
+  
+      /**
+***************
+*** 123,129 ****
+        */
+      T angle(const Vector2& v1) const {
+          // stabler than acos
+!         return VmUtil<T>::abs(VmUtil<T>::atan2(x*v1.y - y*v1.x , dot(v1)));
+      }
+  
+      // copy constructor and operator = is made by complier
+--- 123,129 ----
+        */
+      T angle(const Vector2& v1) const {
+          // stabler than acos
+!         return VmUtil<T>::abs(VmUtil<T>::atan2(this->x*v1.y - this->y*v1.x , dot(v1)));
+      }
+  
+      // copy constructor and operator = is made by complier
+diff -crN vecmath-c++-1.2-1.4/Vector3.h vecmath-c++-1.2-1.4-modified/Vector3.h
+*** vecmath-c++-1.2-1.4/Vector3.h	1999-10-06 11:52:49.000000000 +0900
+--- vecmath-c++-1.2-1.4-modified/Vector3.h	2011-03-29 20:09:06.000000000 +0900
+***************
+*** 103,111 ****
+          T d = length();
+  
+          // zero-div may occur.
+!         x /= d;
+!         y /= d;
+!         z /= d;
+      }
+  
+      /**
+--- 103,111 ----
+          T d = length();
+  
+          // zero-div may occur.
+!         this->x /= d;
+!         this->y /= d;
+!         this->z /= d;
+      }
+  
+      /**
+***************
+*** 113,119 ****
+        * @param  v1 the other vector
+        */
+      T dot(const Vector3& v1) const {
+!         return x*v1.x + y*v1.y + z*v1.z;
+      }
+  
+  
+--- 113,119 ----
+        * @param  v1 the other vector
+        */
+      T dot(const Vector3& v1) const {
+!         return this->x*v1.x + this->y*v1.y + this->z*v1.z;
+      }
+  
+  
+***************
+*** 122,128 ****
+        * @return the squared length of this vector
+        */
+      T lengthSquared() const {
+!         return x*x + y*y + z*z;
+      }
+  
+      /**
+--- 122,128 ----
+        * @return the squared length of this vector
+        */
+      T lengthSquared() const {
+!         return this->x*this->x + this->y*this->y + this->z*this->z;
+      }
+  
+      /**
+diff -crN vecmath-c++-1.2-1.4/Vector4.h vecmath-c++-1.2-1.4-modified/Vector4.h
+*** vecmath-c++-1.2-1.4/Vector4.h	1999-10-06 11:52:50.000000000 +0900
+--- vecmath-c++-1.2-1.4-modified/Vector4.h	2011-03-29 20:09:06.000000000 +0900
+***************
+*** 97,106 ****
+       * @since Java3D 1.2
+       */
+      void set3(const Tuple3<T>& t1) {
+!         x = t1.x;
+!         y = t1.y;
+!         z = t1.z;
+!         w = 0;
+      }
+  
+  
+--- 97,106 ----
+       * @since Java3D 1.2
+       */
+      void set3(const Tuple3<T>& t1) {
+!         this->x = t1.x;
+!         this->y = t1.y;
+!         this->z = t1.z;
+!         this->w = 0;
+      }
+  
+  
+***************
+*** 110,116 ****
+        * @return the squared length of this vector
+        */
+      T lengthSquared() const {
+!         return x*x + y*y + z*z + w*w;
+      }
+  
+      /**
+--- 110,116 ----
+        * @return the squared length of this vector
+        */
+      T lengthSquared() const {
+!         return this->x*this->x + this->y*this->y + this->z*this->z + this->w*this->w;
+      }
+  
+      /**
+***************
+*** 127,133 ****
+       * @return the dot product of this vector and vector v1
+       */
+      T dot(const Vector4& v1) const {
+!         return x*v1.x + y*v1.y + z*v1.z + w*v1.w;
+      }
+  
+      /**
+--- 127,133 ----
+       * @return the dot product of this vector and vector v1
+       */
+      T dot(const Vector4& v1) const {
+!         return this->x*v1.x + this->y*v1.y + this->z*v1.z + this->w*v1.w;
+      }
+  
+      /**
+***************
+*** 146,155 ****
+          T d = length();
+  
+          // zero-div may occur.
+!         x /= d;
+!         y /= d;
+!         z /= d;
+!         w /= d;
+      }
+  
+      /**
+--- 146,155 ----
+          T d = length();
+  
+          // zero-div may occur.
+!         this->x /= d;
+!         this->y /= d;
+!         this->z /= d;
+!         this->w /= d;
+      }
+  
+      /**
+diff -crN vecmath-c++-1.2-1.4/vm_conf.h vecmath-c++-1.2-1.4-modified/vm_conf.h
+*** vecmath-c++-1.2-1.4/vm_conf.h	1999-10-22 12:00:21.000000000 +0900
+--- vecmath-c++-1.2-1.4-modified/vm_conf.h	2011-03-29 20:09:59.000000000 +0900
+***************
+*** 24,36 ****
+  /*
+   * can do 'cout << vec;'
+   */
+! #define VM_INCLUDE_IO
+  
+  /*
+   * can do 'vec.toString();'
+   * automatically defines VM_INCLUDE_IO
+   */
+! #define VM_INCLUDE_TOSTRING
+  
+  /*
+   * places this library in 'kh_vecmath' namespace
+--- 24,36 ----
+  /*
+   * can do 'cout << vec;'
+   */
+! // #define VM_INCLUDE_IO
+  
+  /*
+   * can do 'vec.toString();'
+   * automatically defines VM_INCLUDE_IO
+   */
+! // #define VM_INCLUDE_TOSTRING
+  
+  /*
+   * places this library in 'kh_vecmath' namespace
+***************
+*** 61,67 ****
+   * uses std:: namespace for sqrt, atan2, ...
+   * depends on whether system include files exports these raw names
+   */
+! //#define VM_USE_STD_NAMESPACE
+  
+  /*
+   * uses exception mechanizm (not supported now)
+--- 61,67 ----
+   * uses std:: namespace for sqrt, atan2, ...
+   * depends on whether system include files exports these raw names
+   */
+! #define VM_USE_STD_NAMESPACE
+  
+  /*
+   * uses exception mechanizm (not supported now)
+***************
+*** 79,88 ****
+   * ----------------------------------------------------------- */
+   
+  // gcc earlier than egcs1.1.2, doesn't support namespace
+! #if !(2 <= __GNUC__ && 91 <= __GNUC_MINOR__)
+! #undef VM_INCLUDE_NAMESPACE
+! #undef VM_USE_STD_NAMESPACE
+! #endif
+  
+  
+  #ifdef _MSC_VER
+--- 79,88 ----
+   * ----------------------------------------------------------- */
+   
+  // gcc earlier than egcs1.1.2, doesn't support namespace
+! // #if !(2 <= __GNUC__ && 91 <= __GNUC_MINOR__)
+! // #undef VM_INCLUDE_NAMESPACE
+! // #undef VM_USE_STD_NAMESPACE
+! // #endif
+  
+  
+  #ifdef _MSC_VER

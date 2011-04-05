@@ -1,0 +1,13 @@
+#! /bin/sh -e
+
+prefix=`cd _prefix && pwd`
+name=vecmath-c++-1.2-1.4
+
+cd _build
+gunzip -c "../archive/$name.tar.gz" | tar xf -
+cd "$name"
+chmod 644 *
+patch -p1 <"../../archive/$name.patch"
+make -f Makefile.unix test
+mkdir -p "$prefix/include"
+cp -f *.h "$prefix/include"

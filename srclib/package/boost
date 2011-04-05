@@ -1,0 +1,10 @@
+#! /bin/sh -e
+
+prefix=`cd _prefix && pwd`
+name=boost_1_46_1
+
+cd _build
+bunzip2 -c "../archive/$name.tar.bz2" | tar xf -
+cd "$name"
+./bootstrap.sh --prefix="$prefix"
+./bjam install || true # ignore error
