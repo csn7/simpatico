@@ -1,14 +1,12 @@
 # vim: set ts=2:
 
-# PREFIX      = ../srclib/_prefix
-PREFIX      = ../../simpatico_old/srclib/_prefix
+PREFIX      = ../srclib/_prefix
 CXX         = g++
 CXXFLAGS    = -Wall -O3
 CPPFLAGS    = -I$(PREFIX)/include -I$(PREFIX)/include/FL/images
 LINK.o      = $(CXX)
 FLTK_CONFIG = $(PREFIX)/bin/fltk-config
 FLUID       = $(PREFIX)/bin/fluid
-
 
 LOADLIBES = \
 	$(shell $(FLTK_CONFIG) --use-gl --use-images --ldstaticflags) \
