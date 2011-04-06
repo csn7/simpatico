@@ -52,6 +52,10 @@ namespace simpatico {
       return std::string(buffer.begin(), buffer.end());
     }
 
+    bool eof() const {
+      return in_.eof();
+    }
+
     std::streampos position() const {
       return in_.tellg();
     }

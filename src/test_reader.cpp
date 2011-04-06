@@ -4,7 +4,7 @@
 #include "reader.hpp"
 
 namespace {
-  BOOST_AUTO_TEST_CASE(test_reader0) {
+  BOOST_AUTO_TEST_CASE(test_reader) {
     std::istringstream in("foo\xFE\xED\xFA\xCE\xFF\xFF\x80\x01");
     simpatico::reader<> reader(in);
     BOOST_CHECK(reader.read_string(3) == "foo");
