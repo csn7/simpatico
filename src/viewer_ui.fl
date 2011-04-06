@@ -6,7 +6,7 @@ Function {make_window()} {open
 } {
   Fl_Window {} {
     label {simpatico - viewer} open
-    xywh {326 303 800 525} type Double visible
+    xywh {431 307 800 525} type Double resizable visible
   } {
     Fl_Menu_Bar {} {open
       xywh {0 0 800 25}
@@ -17,10 +17,21 @@ Function {make_window()} {open
       } {
         MenuItem {} {
           label {&Quit}
-          callback {app.quit();} selected
+          callback {app.quit();}
           xywh {0 0 31 20} shortcut 0x400071
         }
       }
+    }
+    Fl_Tile {} {open
+      xywh {0 25 800 500} resizable
+    } {
+      Fl_Group opengl_window {open selected
+        xywh {0 25 500 500}
+        class {simpatico::opengl_window}
+      } {}
+      Fl_Tabs {} {open
+        xywh {500 25 300 500} resizable
+      } {}
     }
   }
 } 
