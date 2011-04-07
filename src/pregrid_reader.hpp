@@ -33,8 +33,8 @@ namespace simpatico {
       float       truelat2;
     };
 
-    typedef boost::function2<
-      void, context const&, std::vector<float> const&
+    typedef boost::function<
+      void (context const&, std::vector<float> const&)
     > function_type;
 
     explicit pregrid_reader(

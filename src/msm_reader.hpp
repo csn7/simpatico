@@ -24,8 +24,8 @@ namespace simpatico {
       int16_t d;
     };
 
-    typedef boost::function2<
-      void, context const&, std::vector<double> const&
+    typedef boost::function<
+      void (context const&, std::vector<double> const&)
     > function_type;
 
     explicit msm_reader(

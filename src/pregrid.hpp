@@ -65,8 +65,7 @@ namespace simpatico {
       images.clear();
       pregrid_reader reader(
           in,
-          boost::bind(read_cb, boost::ref(images), _1, _2),
-          &std::cout);
+          boost::bind(read_cb, boost::ref(images), _1, _2));
       reader.read();
       return true;
     }

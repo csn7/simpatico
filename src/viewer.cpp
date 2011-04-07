@@ -4,6 +4,7 @@
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/optional.hpp>
 #include <boost/ref.hpp>
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
@@ -13,6 +14,7 @@
 #include <FL/glu.H>
 #include "chooser.hpp"
 #include "pregrid.hpp"
+#include "ui_opengl_camera2d.hpp"
 #include "ui_opengl_rectangle.hpp"
 #include "ui_opengl_window.hpp"
 #include "ui_table.hpp"
@@ -21,7 +23,7 @@
 
 vm::Color4b color(double value, double min, double max) {
   double alpha = (value - min) / (max - min);
-  return vm::Color4b(alpha * 255, (1 - alpha) * 255, 0, 255);
+  return vm::Color4b(alpha * 255, 0, (1 - alpha) * 255, 255);
 }
 
 class application : boost::noncopyable {
@@ -32,10 +34,14 @@ public:
 
   int run(int argc, char* argv[]) {
     window->show(argc, argv);
-    opengl_window->function(
+    opengl_window->draw_function(
         boost::bind(
             &application::draw_opengl,
             this));
+    opengl_window->handle_function(
+        boost::bind(
+            &application::handle_opengl,
+            this, _1));
     pregrid_meta->function(
         boost::bind(
             &application::draw_pregrid_cell,
@@ -43,13 +49,27 @@ public:
     return Fl::run();
   }
 
-  void draw_opengl() {
+  int handle_opengl(int event) {
+    {
+      int const result = camera2d_.handle_opengl(event);
+      if (result != 0) {
+        opengl_window->redraw();
+        return result;
+      }
+    }
+    return 0;
+  }
+
+  void draw_opengl() const {
     int const w = opengl_window->w();
     int const h = opengl_window->h();
 
     glViewport(0, 0, w, h);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    camera2d_.draw_opengl(w, h);
+
+/*
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
@@ -62,12 +82,23 @@ public:
         -1,
          1);
     gluLookAt(180, 45, 1, 180, 45, 0, 0, 1, 0);
+*/
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     if (rectangle_) {
       rectangle_->draw_opengl();
+    }
+
+    if (text_) {
+      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      glMatrixMode(GL_PROJECTION);
+      glLoadIdentity();
+      glOrtho(0, w, h, 0, -1, 1);
+      glColor3d(1, 1, 1);
+      gl_font(FL_HELVETICA, 16);
+      gl_draw(text_->c_str(), 10, 20);
     }
 
     glFinish();
@@ -124,6 +155,15 @@ public:
     pregrid_meta->cols(2);
     pregrid_meta->rows(image_->meta_size());
 
+    camera2d_.reset(image_->start(), image_->ended());
+
+    {
+      std::ostringstream out;
+      out << "min: " << image_->data_min() << ", "
+          << "max: " << image_->data_max();
+      text_ = out.str();
+    }
+
     opengl_window->redraw();
   }
 
@@ -132,9 +172,13 @@ public:
   }
 
 private:
-  boost::shared_ptr<simpatico::image> image_;
-  boost::shared_ptr<simpatico::ui_opengl_rectangle> rectangle_;
   std::vector<boost::shared_ptr<simpatico::image> > pregrid_;
+  boost::shared_ptr<simpatico::image> image_;
+
+  simpatico::ui_opengl_camera2d camera2d_;
+
+  boost::optional<std::string> text_;
+  boost::shared_ptr<simpatico::ui_opengl_rectangle> rectangle_;
 
   void idle_() {
   }
