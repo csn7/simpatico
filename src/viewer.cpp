@@ -10,12 +10,19 @@
 #include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
 #include <FL/gl.H>
+#include <FL/glu.H>
 #include "chooser.hpp"
-#include "opengl_window.hpp"
 #include "pregrid.hpp"
+#include "ui_opengl_rectangle.hpp"
+#include "ui_opengl_window.hpp"
 #include "ui_table.hpp"
 
 #include "viewer_ui.hxx"
+
+vm::Color4b color(double value, double min, double max) {
+  double alpha = (value - min) / (max - min);
+  return vm::Color4b(alpha * 255, (1 - alpha) * 255, 0, 255);
+}
 
 class application : boost::noncopyable {
 public:
@@ -42,6 +49,28 @@ public:
 
     glViewport(0, 0, w, h);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    double ratio = w / double(h);
+    glOrtho(
+        -200 * ratio,
+         200 * ratio,
+        -200,
+         200,
+        -1,
+         1);
+    gluLookAt(180, 45, 1, 180, 45, 0, 0, 1, 0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    if (rectangle_) {
+      rectangle_->draw_opengl();
+    }
+
+    glFinish();
   }
 
   void draw_pregrid_cell(
@@ -88,11 +117,14 @@ public:
 
   void select_pregrid_image() {
     image_ = pregrid_[pregrid_image->value()];
+    rectangle_ = boost::make_shared<simpatico::ui_opengl_rectangle>(*image_, color);
 
     pregrid_meta->col_header(1);
     pregrid_meta->col_resize(1);
     pregrid_meta->cols(2);
     pregrid_meta->rows(image_->meta_size());
+
+    opengl_window->redraw();
   }
 
   void quit() {
@@ -101,6 +133,7 @@ public:
 
 private:
   boost::shared_ptr<simpatico::image> image_;
+  boost::shared_ptr<simpatico::ui_opengl_rectangle> rectangle_;
   std::vector<boost::shared_ptr<simpatico::image> > pregrid_;
 
   void idle_() {

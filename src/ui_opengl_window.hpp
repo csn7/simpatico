@@ -1,16 +1,16 @@
-#ifndef SIMPATICO_OPENGL_WINDOW_HPP
-#define SIMPATICO_OPENGL_WINDOW_HPP
+#ifndef SIMPATICO_UI_OPENGL_WINDOW_HPP
+#define SIMPATICO_UI_OPENGL_WINDOW_HPP
 
 #include <FL/Fl.H>
 #include <FL/Fl_Gl_Window.H>
 #include <boost/function.hpp>
 
 namespace simpatico {
-  class opengl_window : public Fl_Gl_Window {
+  class ui_opengl_window : public Fl_Gl_Window {
   public:
     typedef boost::function<void ()> function_type;
 
-    explicit opengl_window(int x, int y, int w, int h, char const* label = 0)
+    explicit ui_opengl_window(int x, int y, int w, int h, char const* label = 0)
       : Fl_Gl_Window(x, y, w, h, label) {}
 
     void function(function_type function) {

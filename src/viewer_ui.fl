@@ -30,9 +30,9 @@ Function {make_window()} {open
     Fl_Tile {} {open
       xywh {0 25 800 500} resizable
     } {
-      Fl_Group opengl_window {open
+      Fl_Group opengl_window {open selected
         xywh {0 25 500 500}
-        class {simpatico::opengl_window}
+        class {simpatico::ui_opengl_window}
       } {}
       Fl_Tabs {} {open
         xywh {500 25 300 500}
@@ -50,7 +50,7 @@ Function {make_window()} {open
             callback {app.select_pregrid_image();} open
             xywh {555 85 240 25} down_box BORDER_BOX
           } {}
-          Fl_Table pregrid_meta {open selected
+          Fl_Table pregrid_meta {open
             xywh {505 115 290 405} resizable
             class {simpatico::ui_table}
           } {}
