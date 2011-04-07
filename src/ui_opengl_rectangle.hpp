@@ -27,7 +27,7 @@ namespace simpatico {
       } else {
         for (int y = 0; y < size_.y; ++y) {
           for (int x = 0; x < size_.x; ++x) {
-            vm::Color4b color = f(image.data(vm::Point2i(x, y)), min, max);
+            vm::Color4b color(f(image.data(vm::Point2i(x, y)), min, max));
             size_t i = (x + y * size_.x) * 4;
             data_[i]     = color.x;
             data_[i + 1] = color.y;
@@ -52,13 +52,13 @@ namespace simpatico {
 
       glBegin(GL_QUADS);
       glColor3d(1, 1, 1);
-      glTexCoord2d(0, 0);
+      glTexCoord2d(0.5, 0.5);
       glVertex2d(start_.x, start_.y);
-      glTexCoord2d(0, size_.y);
+      glTexCoord2d(0.5, size_.y - 0.5);
       glVertex2d(start_.x, ended_.y);
-      glTexCoord2d(size_.x, size_.y);
+      glTexCoord2d(size_.x - 0.5, size_.y - 0.5);
       glVertex2d(ended_.x, ended_.y);
-      glTexCoord2d(size_.x, 0);
+      glTexCoord2d(size_.x - 0.5, 0.5);
       glVertex2d(ended_.x, start_.y);
       glEnd();
 

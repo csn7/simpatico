@@ -29,7 +29,9 @@ namespace simpatico {
         = boost::make_shared<simpatico::image>(
             name.str(),
             vm::Point2d(ctx.startlon, ctx.startlat),
-            vm::Point2d(ctx.deltalon * (ctx.nx - 1), ctx.deltalat * (ctx.ny - 1)),
+            vm::Point2d(
+                ctx.startlon + ctx.deltalon * (ctx.nx - 1),
+                ctx.startlat + ctx.deltalat * (ctx.ny - 1)),
             vm::Tuple2i(ctx.nx, ctx.ny),
             data);
       image->meta_add("ifv",      ctx.ifv);

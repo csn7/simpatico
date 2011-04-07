@@ -7,6 +7,7 @@
 #include <boost/noncopyable.hpp>
 #include <FL/Fl.H>
 #include <FL/gl.H>
+#include <FL/glu.H>
 #include "vecmath.hpp"
 
 namespace simpatico {
@@ -63,7 +64,6 @@ namespace simpatico {
     vm::Point3d center_;
     vm::Point3d eye_;
     vm::Vector3d up_;
-
     boost::array<int, 4> viewport_;
     vm::Matrix4d projection_;
     vm::Point3d mouse_start_;
