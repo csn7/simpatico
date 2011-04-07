@@ -4,9 +4,9 @@ header_name {.hxx}
 code_name {.cxx}
 Function {make_window()} {open
 } {
-  Fl_Window {} {
+  Fl_Window window {
     label {simpatico - viewer} open
-    xywh {431 307 800 525} type Double resizable visible
+    xywh {123 303 800 525} type Double resizable visible
   } {
     Fl_Menu_Bar {} {open
       xywh {0 0 800 25}
@@ -15,6 +15,11 @@ Function {make_window()} {open
         label {&File} open
         xywh {0 0 62 20}
       } {
+        MenuItem {} {
+          label {Open &Pregrid}
+          callback {app.open_pregrid();}
+          xywh {0 0 31 20} shortcut 0x400070
+        }
         MenuItem {} {
           label {&Quit}
           callback {app.quit();}
@@ -25,13 +30,32 @@ Function {make_window()} {open
     Fl_Tile {} {open
       xywh {0 25 800 500} resizable
     } {
-      Fl_Group opengl_window {open selected
+      Fl_Group opengl_window {open
         xywh {0 25 500 500}
         class {simpatico::opengl_window}
       } {}
       Fl_Tabs {} {open
-        xywh {500 25 300 500} resizable
-      } {}
+        xywh {500 25 300 500}
+      } {
+        Fl_Group {} {
+          label Pregrid open
+          xywh {500 50 300 475} resizable
+        } {
+          Fl_Output pregrid_path {
+            label {Path:}
+            xywh {555 55 240 25}
+          }
+          Fl_Choice pregrid_image {
+            label {Image:}
+            callback {app.select_pregrid_image();} open
+            xywh {555 85 240 25} down_box BORDER_BOX
+          } {}
+          Fl_Table pregrid_meta {open selected
+            xywh {505 115 290 405} resizable
+            class {simpatico::ui_table}
+          } {}
+        }
+      }
     }
   }
 } 
