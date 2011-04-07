@@ -25,15 +25,21 @@ namespace simpatico {
       std::ostringstream name;
       name << trim(ctx.hdate) << " " << ctx.xlvl << " " << trim(ctx.desc);
 
+      vm::Point2d start;;
+      vm::Point2d ended;
+      if (ctx.iproj == 0) {
+        // [LNG], [LAT]
+        start.set(ctx.startlon, ctx.startlat);
+        ended.set(ctx.deltalon * (ctx.nx -1), ctx.deltalat * (ctx.ny - 1));
+        ended.add(start);
+      } else {
+        // [km]
+        ended.set(ctx.dx * (ctx.nx - 1), ctx.dy * (ctx.ny - 1));
+      }
       boost::shared_ptr<simpatico::image> image
         = boost::make_shared<simpatico::image>(
-            name.str(),
-            vm::Point2d(ctx.startlon, ctx.startlat),
-            vm::Point2d(
-                ctx.startlon + ctx.deltalon * (ctx.nx - 1),
-                ctx.startlat + ctx.deltalat * (ctx.ny - 1)),
-            vm::Tuple2i(ctx.nx, ctx.ny),
-            data);
+            name.str(), start, ended, vm::Tuple2i(ctx.nx, ctx.ny), data);
+
       image->meta_add("ifv",      ctx.ifv);
       image->meta_add("hdate",    ctx.hdate);
       image->meta_add("xcfst",    ctx.xcfst);
@@ -53,6 +59,7 @@ namespace simpatico {
       image->meta_add("xlonc",    ctx.xlonc);
       image->meta_add("truelat1", ctx.truelat1);
       image->meta_add("truelat2", ctx.truelat2);
+
       images.push_back(image);
     }
 
@@ -67,7 +74,8 @@ namespace simpatico {
       images.clear();
       pregrid_reader reader(
           in,
-          boost::bind(read_cb, boost::ref(images), _1, _2));
+          boost::bind(read_cb, boost::ref(images), _1, _2),
+          &std::cout);
       reader.read();
       return true;
     }

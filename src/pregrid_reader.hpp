@@ -39,63 +39,57 @@ namespace simpatico {
 
     explicit pregrid_reader(
         std::istream& in, function_type const& function, std::ostream* trace = 0)
-      : reader_(in), function_(function), trace_(trace) {}
+      : reader_(in, trace), function_(function) {}
 
     void read() {
       while (read_()) {}
     }
 
+    std::ostream* trace() const {
+      return reader_.trace();
+    }
+
   private:
     fortran_reader<> reader_;
     function_type function_;
-    std::ostream* trace_;
     context ctx_;
 
     bool read_() {
+      if (trace()) {
+        *trace() << "========== record: 1 ==========\n";
+      }
+
       reader_.record_start();
       {
-        ctx_.ifv = reader_.read<int32_t>();
+        ctx_.ifv = reader_.read<int32_t>("ifv");
         if (reader_.eof()) {
           return false;
         }
-
         BOOST_ASSERT(ctx_.ifv == 3);
-
-        if (trace_) {
-          *trace_
-              << "========== record: 1 ==========\n"
-              << "ifv: " << ctx_.ifv << "\n";
-        }
       }
       reader_.record_ended();
+
+      if (trace()) {
+        *trace() << "========== record: 2 ==========\n";
+      }
 
       reader_.record_start();
       {
-        ctx_.hdate = reader_.read_string(24);
-        ctx_.xcfst = reader_.read<float>();
-        ctx_.field = reader_.read_string(9);
-        ctx_.units = reader_.read_string(25);
-        ctx_.desc  = reader_.read_string(46);
-        ctx_.xlvl  = reader_.read<float>();
-        ctx_.nx    = reader_.read<int32_t>();
-        ctx_.ny    = reader_.read<int32_t>();
-        ctx_.iproj = reader_.read<int32_t>();
-
-        if (trace_) {
-          *trace_
-              << "========== record: 2 ==========\n"
-              << "hdate: " << ctx_.hdate << "\n"
-              << "xcfst: " << ctx_.xcfst << "\n"
-              << "field: " << ctx_.field << "\n"
-              << "units: " << ctx_.units << "\n"
-              << "desc: "  << ctx_.desc  << "\n"
-              << "xlvl: "  << ctx_.xlvl  << "\n"
-              << "nx: "    << ctx_.nx    << "\n"
-              << "ny: "    << ctx_.ny    << "\n"
-              << "iproj: " << ctx_.iproj << "\n";
-        }
+        ctx_.hdate = reader_.read_string(24, "hdate");
+        ctx_.xcfst = reader_.read<float>("xcfst");
+        ctx_.field = reader_.read_string(9, "field");
+        ctx_.units = reader_.read_string(25, "units");
+        ctx_.desc  = reader_.read_string(46, "desc");
+        ctx_.xlvl  = reader_.read<float>("xlvl");
+        ctx_.nx    = reader_.read<int32_t>("nx");
+        ctx_.ny    = reader_.read<int32_t>("ny");
+        ctx_.iproj = reader_.read<int32_t>("iproj");
       }
       reader_.record_ended();
+
+      if (trace()) {
+        *trace() << "========== record: 3 ==========\n";
+      }
 
       reader_.record_start();
       {
@@ -115,23 +109,12 @@ namespace simpatico {
           default:
             BOOST_ASSERT(! "Unknown projection");
         }
-
-        if (trace_) {
-          *trace_
-              << "========== record: 3 ==========\n"
-              << "startlat: " << ctx_.startlat << "\n"
-              << "startlon: " << ctx_.startlon << "\n"
-              << "deltalat: " << ctx_.deltalat << "\n"
-              << "deltalon: " << ctx_.deltalon << "\n"
-              << "dx: "       << ctx_.dx       << "\n"
-              << "dy: "       << ctx_.dy       << "\n"
-              << "xlonc: "    << ctx_.xlonc    << "\n"
-              << "truelat1: " << ctx_.truelat1 << "\n"
-              << "truelat2: " << ctx_.truelat2 << "\n"
-              ;
-        }
       }
       reader_.record_ended();
+
+      if (trace()) {
+        *trace() << "========== record: 4 ==========\n";
+      }
 
       std::vector<float> slab(ctx_.nx * ctx_.ny);
       reader_.record_start();
@@ -150,10 +133,10 @@ namespace simpatico {
 
   private:
     void read_cylindrical_equidistant_projection_() {
-      ctx_.startlat = reader_.read<float>();
-      ctx_.startlon = reader_.read<float>();
-      ctx_.deltalat = reader_.read<float>();
-      ctx_.deltalon = reader_.read<float>();
+      ctx_.startlat = reader_.read<float>("startlat");
+      ctx_.startlon = reader_.read<float>("startlon");
+      ctx_.deltalat = reader_.read<float>("deltalat");
+      ctx_.deltalon = reader_.read<float>("deltalon");
       ctx_.dx       = 0;
       ctx_.dy       = 0;
       ctx_.xlonc    = 0;
@@ -162,38 +145,38 @@ namespace simpatico {
     }
 
     void read_mercator_projection_() {
-      ctx_.startlat = reader_.read<float>();
-      ctx_.startlon = reader_.read<float>();
+      ctx_.startlat = reader_.read<float>("startlat");
+      ctx_.startlon = reader_.read<float>("startlon");
       ctx_.deltalat = 0;
       ctx_.deltalon = 0;
-      ctx_.dx       = reader_.read<float>();
-      ctx_.dy       = reader_.read<float>();
+      ctx_.dx       = reader_.read<float>("dx");
+      ctx_.dy       = reader_.read<float>("dy");
       ctx_.xlonc    = 0;
-      ctx_.truelat1 = reader_.read<float>();
+      ctx_.truelat1 = reader_.read<float>("truelat1");
       ctx_.truelat2 = 0;
     }
 
     void read_lambert_conformal_projection_() {
-      ctx_.startlat = reader_.read<float>();
-      ctx_.startlon = reader_.read<float>();
+      ctx_.startlat = reader_.read<float>("startlat");
+      ctx_.startlon = reader_.read<float>("startlon");
       ctx_.deltalat = 0;
       ctx_.deltalon = 0;
-      ctx_.dx       = reader_.read<float>();
-      ctx_.dy       = reader_.read<float>();
-      ctx_.xlonc    = reader_.read<float>();
-      ctx_.truelat1 = reader_.read<float>();
-      ctx_.truelat2 = reader_.read<float>();
+      ctx_.dx       = reader_.read<float>("dx");
+      ctx_.dy       = reader_.read<float>("dy");
+      ctx_.xlonc    = reader_.read<float>("xlonc");
+      ctx_.truelat1 = reader_.read<float>("truelat1");
+      ctx_.truelat2 = reader_.read<float>("truelat2");
     }
 
     void read_polar_stereographic_projection_() {
-      ctx_.startlat = reader_.read<float>();
-      ctx_.startlon = reader_.read<float>();
+      ctx_.startlat = reader_.read<float>("startlat");
+      ctx_.startlon = reader_.read<float>("startlon");
       ctx_.deltalat = 0;
       ctx_.deltalon = 0;
-      ctx_.dx       = reader_.read<float>();
-      ctx_.dy       = reader_.read<float>();
+      ctx_.dx       = reader_.read<float>("dx");
+      ctx_.dy       = reader_.read<float>("dy");
       ctx_.xlonc    = 0;
-      ctx_.truelat1 = reader_.read<float>();
+      ctx_.truelat1 = reader_.read<float>("truelat1");
       ctx_.truelat2 = 0;
     }
   };
