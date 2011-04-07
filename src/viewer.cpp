@@ -10,7 +10,6 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Table.H>
-#include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
 #include <FL/gl.H>
 #include <FL/gl_draw.H>
@@ -80,13 +79,16 @@ public:
 
     if (text_) {
       glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
       glMatrixMode(GL_PROJECTION);
       glPushMatrix();
       glLoadIdentity();
+
       glOrtho(0, w, h, 0, -1, 1);
       glColor3d(1, 1, 1);
       gl_font(FL_HELVETICA, 16);
       gl_draw(text_->c_str(), 10, 20);
+
       glPopMatrix();
     }
 
@@ -133,6 +135,14 @@ public:
       pregrid_image->add(i->name().c_str());
     }
     pregrid_meta->clear();
+  }
+
+  void save_screenshot() {
+    boost::optional<std::string> path = simpatico::chooser::browse_save_file();
+    if (! path) {
+      return;
+    }
+    opengl_window->save_screenshot(*path);
   }
 
   void select_pregrid_image() {

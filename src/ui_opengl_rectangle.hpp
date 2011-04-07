@@ -39,7 +39,7 @@ namespace simpatico {
     }
 
     void draw_opengl() const {
-      glEnable(GL_TEXTURE_2D);
+      glEnable(GL_TEXTURE);
       glEnable(GL_TEXTURE_RECTANGLE_EXT);
 
       glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
@@ -62,7 +62,7 @@ namespace simpatico {
       glVertex2d(ended_.x, start_.y);
       glEnd();
 
-      glDisable(GL_TEXTURE_2D);
+      glDisable(GL_TEXTURE);
       glDisable(GL_TEXTURE_RECTANGLE_EXT);
     }
 
