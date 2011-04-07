@@ -60,7 +60,7 @@ public:
     return 0;
   }
 
-  void draw_opengl() const {
+  void draw_opengl() {
     int const w = opengl_window->w();
     int const h = opengl_window->h();
 
@@ -68,21 +68,6 @@ public:
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     camera2d_.draw_opengl(w, h);
-
-/*
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-
-    double ratio = w / double(h);
-    glOrtho(
-        -200 * ratio,
-         200 * ratio,
-        -200,
-         200,
-        -1,
-         1);
-    gluLookAt(180, 45, 1, 180, 45, 0, 0, 1, 0);
-*/
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -94,11 +79,13 @@ public:
     if (text_) {
       glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
       glMatrixMode(GL_PROJECTION);
+      glPushMatrix();
       glLoadIdentity();
       glOrtho(0, w, h, 0, -1, 1);
       glColor3d(1, 1, 1);
       gl_font(FL_HELVETICA, 16);
       gl_draw(text_->c_str(), 10, 20);
+      glPopMatrix();
     }
 
     glFinish();
