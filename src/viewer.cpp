@@ -14,6 +14,7 @@
 #include <FL/gl.H>
 #include <FL/gl_draw.H>
 #include "chooser.hpp"
+#include "msm.hpp"
 #include "pregrid.hpp"
 #include "ui_opengl_camera2d.hpp"
 #include "ui_opengl_rectangle.hpp"
@@ -43,9 +44,9 @@ public:
         boost::bind(
             &application::handle_opengl,
             this, _1));
-    pregrid_meta->function(
+    image_meta->function(
         boost::bind(
-            &application::draw_pregrid_cell,
+            &application::draw_image_meta_cell,
             this, _1, _2, _3, _4, _5, _6, _7));
     return Fl::run();
   }
@@ -95,7 +96,7 @@ public:
     glFinish();
   }
 
-  void draw_pregrid_cell(
+  void draw_image_meta_cell(
       Fl_Table::TableContext ctx, int r, int c, int x, int y, int w, int h) {
     static int const padding = 2;
     static char const* const header[] = { "Name", "Value" };
@@ -119,22 +120,30 @@ public:
     }
   }
 
+  void open_msm() {
+    boost::optional<std::string> path = simpatico::chooser::browse_file();
+    if (! path) {
+      return;
+    }
+
+    if (! simpatico::msm::read(*path, images_)) {
+      return;
+    }
+
+    initialize_image_(*path);
+  }
+
   void open_pregrid() {
     boost::optional<std::string> path = simpatico::chooser::browse_file();
     if (! path) {
       return;
     }
 
-    if (! simpatico::pregrid::read(*path, pregrid_)) {
+    if (! simpatico::pregrid::read(*path, images_)) {
       return;
     }
 
-    pregrid_path->value(path->c_str());
-    pregrid_image->clear();
-    BOOST_FOREACH(boost::shared_ptr<simpatico::image> i, pregrid_) {
-      pregrid_image->add(i->name().c_str());
-    }
-    pregrid_meta->clear();
+    initialize_image_(*path);
   }
 
   void save_screenshot() {
@@ -145,14 +154,14 @@ public:
     opengl_window->save_screenshot(*path);
   }
 
-  void select_pregrid_image() {
-    image_ = pregrid_[pregrid_image->value()];
+  void select_image_name() {
+    image_ = images_[image_name->value()];
     rectangle_ = boost::make_shared<simpatico::ui_opengl_rectangle>(*image_, color);
 
-    pregrid_meta->col_header(1);
-    pregrid_meta->col_resize(1);
-    pregrid_meta->cols(2);
-    pregrid_meta->rows(image_->meta_size());
+    image_meta->col_header(1);
+    image_meta->col_resize(1);
+    image_meta->cols(2);
+    image_meta->rows(image_->meta_size());
 
     camera2d_.reset(image_->start(), image_->ended());
 
@@ -171,15 +180,23 @@ public:
   }
 
 private:
-  std::vector<boost::shared_ptr<simpatico::image> > pregrid_;
+  std::vector<boost::shared_ptr<simpatico::image> > images_;
   boost::shared_ptr<simpatico::image> image_;
 
   simpatico::ui_opengl_camera2d camera2d_;
-
-  boost::optional<std::string> text_;
   boost::shared_ptr<simpatico::ui_opengl_rectangle> rectangle_;
+  boost::optional<std::string> text_;
 
   void idle_() {
+  }
+
+  void initialize_image_(const std::string& path) {
+    image_path->value(path.c_str());
+    image_name->clear();
+    BOOST_FOREACH(boost::shared_ptr<simpatico::image> i, images_) {
+      image_name->add(i->name().c_str());
+    }
+    image_meta->clear();
   }
 };
 

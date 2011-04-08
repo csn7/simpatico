@@ -230,12 +230,12 @@ namespace simpatico {
       reader_.read<uint8_t>("Minutes of observational data cutoff after reference time");
       reader_.read<uint8_t>("Indicator of unit of time range");
       reader_.read<uint32_t>("Forecast time in units defined by octet 18");
-      reader_.read<uint32_t>("Type of first fixed surface");
-      reader_.read<uint8_t>("Scale factor of first fixed surface");
-      reader_.read<uint8_t>("Scaled value of first fixed surface");
-      reader_.read<uint32_t>("Type of second fixed surface");
-      reader_.read<uint8_t>("Scale factor of second fixed surface");
-      reader_.read<uint8_t>("Scaled value of second fixed surface");
+      reader_.read<uint8_t>("Type of first fixed surface");
+      reader_.read_1s_complement<int8_t>("Scale factor of first fixed surface");
+      reader_.read<uint32_t>("Scaled value of first fixed surface");
+      reader_.read<uint8_t>("Type of second fixed surface");
+      reader_.read_1s_complement<int8_t>("Scale factor of second fixed surface");
+      reader_.read<uint32_t>("Scaled value of second fixed surface");
     }
 
     // Template 4.0

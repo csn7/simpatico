@@ -8,9 +8,9 @@
 #include <vector>
 #include <boost/bind.hpp>
 #include <boost/make_shared.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/ref.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/swap.hpp>
 #include "image.hpp"
 #include "pregrid_reader.hpp"
 #include "trim.hpp"
@@ -65,18 +65,17 @@ namespace simpatico {
 
     inline bool read(
         std::string const& path,
-        std::vector<boost::shared_ptr<image> >& images) {
+        std::vector<boost::shared_ptr<image> >& target) {
       std::ifstream in(path.c_str(), std::ios::in | std::ios::binary);
       if (! in) {
         return false;
       }
 
-      images.clear();
+      std::vector<boost::shared_ptr<image> > source;
       pregrid_reader reader(
-          in,
-          boost::bind(read_cb, boost::ref(images), _1, _2),
-          &std::cout);
+          in, boost::bind(read_cb, boost::ref(source), _1, _2));
       reader.read();
+      boost::swap(source, target);
       return true;
     }
   }
