@@ -1,6 +1,7 @@
 #ifndef SIMPATICO_READER_HPP
 #define SIMPATICO_READER_HPP
 
+#include <stdint.h>
 #include <iostream>
 #include <string>
 #include <boost/noncopyable.hpp>
@@ -26,7 +27,11 @@ namespace simpatico {
       endian<T_is_big_endian>::swap(cast.begin(), cast.end());
 
       if (trace_ && name) {
-        *trace_ << "| " << name << ": " << cast.get() << "\n";
+        if (sizeof(T) == 1) {
+          *trace_ << "| " << name << ": " << int16_t(cast.get()) << "\n";
+        } else {
+          *trace_ << "| " << name << ": " << cast.get() << "\n";
+        }
       }
       return cast.get();
     }
@@ -46,7 +51,11 @@ namespace simpatico {
       }
 
       if (trace_ && name) {
-        *trace_ << "| " << name << ": " << value << "\n";
+        if (sizeof(T) == 1) {
+          *trace_ << "| " << name << ": " << int16_t(value) << "\n";
+        } else {
+          *trace_ << "| " << name << ": " << value << "\n";
+        }
       }
       return value;
     }

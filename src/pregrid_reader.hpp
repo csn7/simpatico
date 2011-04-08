@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include <boost/assert.hpp>
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 #include "fortran_reader.hpp"
@@ -131,7 +132,6 @@ namespace simpatico {
       return true;
     }
 
-  private:
     void read_cylindrical_equidistant_projection_() {
       ctx_.startlat = reader_.read<float>("startlat");
       ctx_.startlon = reader_.read<float>("startlon");
