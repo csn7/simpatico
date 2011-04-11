@@ -3,9 +3,9 @@
 
 #include <stdint.h>
 #include <vector>
-#include <boost/assert.hpp>
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
+#include "assert.hpp"
 #include "fortran_reader.hpp"
 
 namespace simpatico {

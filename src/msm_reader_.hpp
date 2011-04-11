@@ -5,10 +5,10 @@
 #include <string.h>
 #include <time.h>
 #include <iostream>
-#include <boost/assert.hpp>
 #include <boost/function.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include "assert.hpp"
 #include "reader.hpp"
 #include "time.hpp"
 

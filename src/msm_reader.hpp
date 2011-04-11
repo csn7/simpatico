@@ -6,9 +6,9 @@
 #include <stdint.h>
 #include <time.h>
 #include <iostream>
-#include <boost/assert.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/function.hpp>
+#include "assert.hpp"
 #include "reader.hpp"
 
 namespace simpatico {

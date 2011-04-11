@@ -1,8 +1,8 @@
 #include <stdlib.h>
+#include <exception>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <boost/assert.hpp>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 #include <boost/function.hpp>
@@ -12,8 +12,10 @@
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Table.H>
 #include <FL/fl_draw.H>
+#include <FL/fl_ask.H>
 #include <FL/gl.H>
 #include <FL/gl_draw.H>
+#include "assert.hpp"
 #include "chooser.hpp"
 #include "msm.hpp"
 #include "pregrid.hpp"
@@ -126,29 +128,33 @@ public:
   }
 
   void open_msm() {
-    boost::optional<std::string> path = simpatico::chooser::browse_file();
-    if (! path) {
-      return;
+    try {
+      boost::optional<std::string> path = simpatico::chooser::browse_file();
+      if (! path) {
+        return;
+      }
+      if (! simpatico::msm::read(*path, images_)) {
+        return;
+      }
+      initialize_image_(*path);
+    } catch (std::exception const& e) {
+      fl_alert("%s", e.what());
     }
-
-    if (! simpatico::msm::read(*path, images_)) {
-      return;
-    }
-
-    initialize_image_(*path);
   }
 
   void open_pregrid() {
-    boost::optional<std::string> path = simpatico::chooser::browse_file();
-    if (! path) {
-      return;
+    try {
+      boost::optional<std::string> path = simpatico::chooser::browse_file();
+      if (! path) {
+        return;
+      }
+      if (! simpatico::pregrid::read(*path, images_)) {
+        return;
+      }
+      initialize_image_(*path);
+    } catch (std::exception const& e) {
+      fl_alert("%s", e.what());
     }
-
-    if (! simpatico::pregrid::read(*path, images_)) {
-      return;
-    }
-
-    initialize_image_(*path);
   }
 
   void save_screenshot() {

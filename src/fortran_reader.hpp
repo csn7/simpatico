@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 #include <iostream>
-#include <boost/assert.hpp>
 #include <boost/noncopyable.hpp>
+#include "assert.hpp"
 #include "reader.hpp"
 
 namespace simpatico {
