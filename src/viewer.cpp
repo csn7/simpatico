@@ -5,6 +5,7 @@
 #include <boost/assert.hpp>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
+#include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/optional.hpp>
 #include <FL/Fl.H>
@@ -16,6 +17,7 @@
 #include "chooser.hpp"
 #include "msm.hpp"
 #include "pregrid.hpp"
+#include "ui_color.hpp"
 #include "ui_opengl_camera2d.hpp"
 #include "ui_opengl_rectangle.hpp"
 #include "ui_opengl_window.hpp"
@@ -23,16 +25,19 @@
 
 #include "viewer_ui.hxx"
 
-vm::Color4b color(double value, double min, double max) {
-  double alpha = (value - min) / (max - min);
-  return vm::Color4b(alpha * 255, 0, (1 - alpha) * 255, 255);
-}
-
 class application : boost::noncopyable {
 public:
   static void idle(void* self) {
     static_cast<application*>(self)->idle_();
   }
+
+  application()
+    : image_color_(
+          boost::bind(
+              simpatico::ui_color::linear,
+              vm::Color4d(0, 0, 1, 1),
+              vm::Color4d(1, 0, 0, 1),
+              _1, _2, _3)) {}
 
   int run(int argc, char* argv[]) {
     window->show(argc, argv);
@@ -156,7 +161,8 @@ public:
 
   void select_image_name() {
     image_ = images_[image_name->value()];
-    rectangle_ = boost::make_shared<simpatico::ui_opengl_rectangle>(*image_, color);
+    rectangle_ = boost::make_shared<simpatico::ui_opengl_rectangle>(
+        *image_, image_color_);
 
     image_meta->col_header(1);
     image_meta->col_resize(1);
@@ -175,6 +181,16 @@ public:
     opengl_window->redraw();
   }
 
+  template <typename T_function>
+  void select_image_color(T_function image_color) {
+    image_color_ = image_color;
+    if (image_) {
+      rectangle_ = boost::make_shared<simpatico::ui_opengl_rectangle>(
+          *image_, image_color_);
+    }
+    opengl_window->redraw();
+  }
+
   void quit() {
     exit(0);
   }
@@ -182,6 +198,7 @@ public:
 private:
   std::vector<boost::shared_ptr<simpatico::image> > images_;
   boost::shared_ptr<simpatico::image> image_;
+  boost::function<vm::Color4b (double, double, double)> image_color_;
 
   simpatico::ui_opengl_camera2d camera2d_;
   boost::shared_ptr<simpatico::ui_opengl_rectangle> rectangle_;

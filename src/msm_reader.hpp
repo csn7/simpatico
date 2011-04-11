@@ -2,6 +2,7 @@
 #define SIMPATICO_MSM_READER_HPP
 
 #include <math.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <time.h>
 #include <iostream>
@@ -16,19 +17,21 @@ namespace simpatico {
   public:
     struct context {
       struct tm reference_time;
-      uint32_t n_i;
-      uint32_t n_j;
-      uint32_t la_1;
-      uint32_t lo_1;
-      uint32_t la_2;
-      uint32_t lo_2;
-      uint32_t d_i;
-      uint32_t d_j;
+      size_t n_i;
+      size_t n_j;
+      double la_1;
+      double lo_1;
+      double la_2;
+      double lo_2;
+      double d_i;
+      double d_j;
       int parameter_category;
       int parameter_number;
-      float r;
-      int16_t e;
-      int16_t d;
+      int surface_type;
+      double surface_value;
+      double r;
+      int e;
+      int d;
     };
 
     typedef boost::function<
@@ -170,13 +173,13 @@ namespace simpatico {
       ctx_.n_j = reader_.read<uint32_t>("Nj - number of points along a meridian");
       reader_.read<uint32_t>("Basic angle of the initial production domain");
       reader_.read<uint32_t>("Subdivisions of basic angle used to define extreme longitudes and latitudes, and direction increments");
-      ctx_.la_1 = reader_.read<uint32_t>("La1 - latitude of first grid point");
-      ctx_.lo_1 = reader_.read<uint32_t>("Lo1 - longitude of first grid point");
+      ctx_.la_1 = reader_.read<uint32_t>("La1 - latitude of first grid point") * 0.000001;
+      ctx_.lo_1 = reader_.read<uint32_t>("Lo1 - longitude of first grid point") * 0.000001;
       reader_.read<uint8_t>("Resolution and component flags");
-      ctx_.la_2 = reader_.read<uint32_t>("La2 - latitude of last grid point");
-      ctx_.lo_2 = reader_.read<uint32_t>("Lo2 - longitude of last grid point");
-      ctx_.d_i = reader_.read<uint32_t>("Di - i direction increment");
-      ctx_.d_j = reader_.read<uint32_t>("Dj - j direction increment");
+      ctx_.la_2 = reader_.read<uint32_t>("La2 - latitude of last grid point") * 0.000001;
+      ctx_.lo_2 = reader_.read<uint32_t>("Lo2 - longitude of last grid point") * 0.000001;
+      ctx_.d_i = reader_.read<uint32_t>("Di - i direction increment") * 0.000001;
+      ctx_.d_j = reader_.read<uint32_t>("Dj - j direction increment") * 0.000001;
       reader_.read<uint8_t>("Scanning mode");
       reader_.skip(section_size_ - 72);
     }
@@ -230,9 +233,14 @@ namespace simpatico {
       reader_.read<uint8_t>("Minutes of observational data cutoff after reference time");
       reader_.read<uint8_t>("Indicator of unit of time range");
       reader_.read<uint32_t>("Forecast time in units defined by octet 18");
-      reader_.read<uint8_t>("Type of first fixed surface");
-      reader_.read_1s_complement<int8_t>("Scale factor of first fixed surface");
-      reader_.read<uint32_t>("Scaled value of first fixed surface");
+      ctx_.surface_type = reader_.read<uint8_t>("Type of first fixed surface");
+      double f = reader_.read_1s_complement<int8_t>("Scale factor of first fixed surface");
+      double v = reader_.read<uint32_t>("Scaled value of first fixed surface");
+      if (ctx_.surface_type == 100) {
+        ctx_.surface_value = v * pow(10, -f);
+      } else {
+        ctx_.surface_value = 0;
+      }
       reader_.read<uint8_t>("Type of second fixed surface");
       reader_.read_1s_complement<int8_t>("Scale factor of second fixed surface");
       reader_.read<uint32_t>("Scaled value of second fixed surface");
@@ -314,8 +322,8 @@ namespace simpatico {
       reader_.read_buffer(buffer);
 
       std::vector<double> data(ctx_.n_i * ctx_.n_j);
-      for (uint32_t j = 0; j < ctx_.n_j; ++j) {
-        for (uint32_t i = 0; i < ctx_.n_i; ++i) {
+      for (size_t j = 0; j < ctx_.n_j; ++j) {
+        for (size_t i = 0; i < ctx_.n_i; ++i) {
           int bit_index = (i + j * ctx_.n_i) * 12;
           double value;
           if (bit_index % 8 == 0) {

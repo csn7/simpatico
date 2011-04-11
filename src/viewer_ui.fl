@@ -6,7 +6,7 @@ Function {make_window()} {open
 } {
   Fl_Window window {
     label {simpatico - viewer} open
-    xywh {16 266 800 525} type Double resizable visible
+    xywh {16 182 800 525} type Double resizable visible
   } {
     Fl_Menu_Bar {} {open
       xywh {0 0 800 25}
@@ -17,7 +17,7 @@ Function {make_window()} {open
       } {
         MenuItem {} {
           label {Open &MSM}
-          callback {app.open_msm();} selected
+          callback {app.open_msm();}
           xywh {0 0 31 20} shortcut 0x40006d
         }
         MenuItem {} {
@@ -60,8 +60,33 @@ Function {make_window()} {open
             callback {app.select_image_name();} open
             xywh {555 85 240 25} down_box BORDER_BOX
           } {}
+          Fl_Choice image_color {
+            label {Color:} open
+            xywh {555 115 240 25} down_box BORDER_BOX
+          } {
+            MenuItem {} {
+              label {Blue to Red}
+              callback {app.select_image_color(
+    boost::bind(
+        simpatico::ui_color::linear,
+        vm::Color4d(0, 0, 1, 1),
+        vm::Color4d(1, 0, 0, 1),
+        _1, _2, _3));}
+              xywh {0 0 31 20}
+            }
+            MenuItem {} {
+              label {Black to White}
+              callback {app.select_image_color(
+    boost::bind(
+        simpatico::ui_color::linear,
+        vm::Color4d(0, 0, 0, 1),
+        vm::Color4d(1, 1, 1, 1),
+        _1, _2, _3));} selected
+              xywh {0 0 31 20}
+            }
+          }
           Fl_Table image_meta {open
-            xywh {505 115 290 405} resizable
+            xywh {505 145 290 375} resizable
             class {simpatico::ui_table}
           } {}
         }

@@ -19,7 +19,8 @@ namespace simpatico {
       : start_(image.start()),
         ended_(image.ended()),
         size_(image.size()),
-        data_(size_.x * size_.y * 4) {
+        data_(size_.x * size_.y * 4),
+        is_first_(true) {
       double const min = image.data_min();
       double const max = image.data_max();
       if (min == max) {
@@ -38,17 +39,22 @@ namespace simpatico {
       }
     }
 
-    void draw_opengl() const {
+    void draw_opengl() {
       glEnable(GL_TEXTURE);
       glEnable(GL_TEXTURE_RECTANGLE_EXT);
 
-      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-      glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-      glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-      glTexImage2D(
-          GL_TEXTURE_RECTANGLE_EXT, 0,
-          GL_RGBA, size_.x, size_.y, 0,
-          GL_RGBA, GL_UNSIGNED_BYTE, &data_[0]);
+      if (is_first_) {
+        is_first_ = false;
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+        glTexParameteri(
+            GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(
+            GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexImage2D(
+            GL_TEXTURE_RECTANGLE_EXT, 0,
+            GL_RGBA, size_.x, size_.y, 0,
+            GL_RGBA, GL_UNSIGNED_BYTE, &data_[0]);
+      }
 
       glBegin(GL_QUADS);
       glColor3d(1, 1, 1);
@@ -71,6 +77,7 @@ namespace simpatico {
     vm::Point2d ended_;
     vm::Tuple2i size_;
     std::vector<uint8_t> data_;
+    bool is_first_;
   };
 }
 

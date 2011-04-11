@@ -6,8 +6,7 @@
 namespace {
   inline void read_cb(
       simpatico::msm_reader::context const& ctx,
-      std::vector<double> const& data) {
-  }
+      std::vector<double> const& data) {}
 
   BOOST_AUTO_TEST_CASE(test_msm_reader0) {
     std::ifstream in(
@@ -21,7 +20,7 @@ namespace {
     std::ifstream in(
         "../data/Z__C_RJTD_20110314000000_MSM_GPV_Rjp_L-pall_FH00-15_grib2.bin",
         std::ios::in | std::ios::binary);
-    simpatico::msm_reader reader(in, read_cb, &std::cout);
+    simpatico::msm_reader reader(in, read_cb);
     reader.read();
   }
 }
