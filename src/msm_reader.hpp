@@ -27,6 +27,7 @@ namespace simpatico {
       double d_j;
       int parameter_category;
       int parameter_number;
+      double forecast_time;
       int surface_type;
       double surface_value;
       double r;
@@ -127,7 +128,7 @@ namespace simpatico {
       reader_.read<uint8_t>("Version number of GRIB Local Tables used to augment Master Tables");
       reader_.read<uint8_t>("Significance of Reference Time");
 
-      memset(&ctx_.reference_time, sizeof(ctx_.reference_time), 0);
+      memset(&ctx_.reference_time, 0, sizeof(ctx_.reference_time));
       ctx_.reference_time.tm_year = reader_.read<uint16_t>("Year") - 1900;
       ctx_.reference_time.tm_mon  = reader_.read<uint8_t>("Month") - 1;
       ctx_.reference_time.tm_mday = reader_.read<uint8_t>("Day");
@@ -226,13 +227,17 @@ namespace simpatico {
     void read_product_definition_template0_or_template8_() {
       ctx_.parameter_category = reader_.read<uint8_t>("Parameter category");
       ctx_.parameter_number = reader_.read<uint8_t>("Parameter number");
+
       reader_.read<uint8_t>("Type of generating process");
       reader_.read<uint8_t>("Background generating process identifier");
       reader_.read<uint8_t>("Analysis or forecast generating processes identifier");
       reader_.read<uint16_t>("Hours of observational data cutoff after reference time");
       reader_.read<uint8_t>("Minutes of observational data cutoff after reference time");
-      reader_.read<uint8_t>("Indicator of unit of time range");
-      reader_.read<uint32_t>("Forecast time in units defined by octet 18");
+
+      int unit = reader_.read<uint8_t>("Indicator of unit of time range");
+      BOOST_ASSERT(unit == 1);
+      ctx_.forecast_time = reader_.read<uint32_t>("Forecast time in units defined by octet 18") * 3600.0;
+
       ctx_.surface_type = reader_.read<uint8_t>("Type of first fixed surface");
       double f = reader_.read_1s_complement<int8_t>("Scale factor of first fixed surface");
       double v = reader_.read<uint32_t>("Scaled value of first fixed surface");
@@ -241,6 +246,7 @@ namespace simpatico {
       } else {
         ctx_.surface_value = 0;
       }
+
       reader_.read<uint8_t>("Type of second fixed surface");
       reader_.read_1s_complement<int8_t>("Scale factor of second fixed surface");
       reader_.read<uint32_t>("Scaled value of second fixed surface");

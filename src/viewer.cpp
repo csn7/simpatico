@@ -8,6 +8,7 @@
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/optional.hpp>
+#include <boost/xpressive/xpressive.hpp>
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Table.H>
@@ -214,10 +215,21 @@ private:
   }
 
   void initialize_image_(const std::string& path) {
+    using boost::xpressive::s1;
+    using boost::xpressive::set;
+
+    static boost::xpressive::sregex const regex((s1= (set= '&', '/', '\\', '_')));
+    static std::string const format = "\\\\$1";
+
     image_path->value(path.c_str());
     image_name->clear();
     BOOST_FOREACH(boost::shared_ptr<simpatico::image> i, images_) {
-      image_name->add(i->name().c_str());
+      image_name->add(
+          boost::xpressive::regex_replace(
+              i->name(),
+              regex,
+              format,
+              boost::xpressive::regex_constants::format_perl).c_str(), 0, 0);
     }
     image_meta->clear();
   }
