@@ -2,41 +2,20 @@
 #define SIMPATICO_MSM_READER_HPP
 
 #include <math.h>
-#include <stddef.h>
 #include <stdint.h>
-#include <time.h>
 #include <iostream>
 #include <boost/noncopyable.hpp>
 #include <boost/function.hpp>
 #include "assert.hpp"
+#include "msm_context.hpp"
 #include "reader.hpp"
 
 namespace simpatico {
   // http://www.wmo.int/pages/prog/www/WMOCodes/Guides/GRIB/GRIB2_062006.pdf
   class msm_reader : boost::noncopyable {
   public:
-    struct context {
-      struct tm reference_time;
-      size_t n_i;
-      size_t n_j;
-      double la_1;
-      double lo_1;
-      double la_2;
-      double lo_2;
-      double d_i;
-      double d_j;
-      int parameter_category;
-      int parameter_number;
-      double forecast_time;
-      int surface_type;
-      double surface_value;
-      double r;
-      int e;
-      int d;
-    };
-
     typedef boost::function<
-      void (context const&, std::vector<double> const& data)
+      void (msm_context const&, std::vector<double> const& data)
     > function_type;
 
     explicit msm_reader(
@@ -60,7 +39,7 @@ namespace simpatico {
     function_type function_;
     uint32_t section_size_;
     int data_representation_template_;
-    context ctx_;
+    msm_context context_;
 
     uint64_t read_indicator_section_() {
       if (trace()) {
@@ -128,13 +107,13 @@ namespace simpatico {
       reader_.read<uint8_t>("Version number of GRIB Local Tables used to augment Master Tables");
       reader_.read<uint8_t>("Significance of Reference Time");
 
-      memset(&ctx_.reference_time, 0, sizeof(ctx_.reference_time));
-      ctx_.reference_time.tm_year = reader_.read<uint16_t>("Year") - 1900;
-      ctx_.reference_time.tm_mon  = reader_.read<uint8_t>("Month") - 1;
-      ctx_.reference_time.tm_mday = reader_.read<uint8_t>("Day");
-      ctx_.reference_time.tm_hour = reader_.read<uint8_t>("Hour");
-      ctx_.reference_time.tm_min  = reader_.read<uint8_t>("Minute");
-      ctx_.reference_time.tm_sec  = reader_.read<uint8_t>("Second");
+      memset(&context_.reference_time, 0, sizeof(context_.reference_time));
+      context_.reference_time.tm_year = reader_.read<uint16_t>("Year") - 1900;
+      context_.reference_time.tm_mon  = reader_.read<uint8_t>("Month") - 1;
+      context_.reference_time.tm_mday = reader_.read<uint8_t>("Day");
+      context_.reference_time.tm_hour = reader_.read<uint8_t>("Hour");
+      context_.reference_time.tm_min  = reader_.read<uint8_t>("Minute");
+      context_.reference_time.tm_sec  = reader_.read<uint8_t>("Second");
 
       reader_.read<uint8_t>("Production status of processed data in this GRIB message");
       reader_.read<uint8_t>("Type of processed data in this GRIB message");
@@ -170,17 +149,17 @@ namespace simpatico {
       reader_.read<uint32_t>("Scaled value of major axis of oblate spheroid earth");
       reader_.read<uint8_t>("Scale factor of minor axis of oblate spheroid earth");
       reader_.read<uint32_t>("Scaled value of minor axis of oblate spheroid earth");
-      ctx_.n_i = reader_.read<uint32_t>("Ni - number of points along a parallel");
-      ctx_.n_j = reader_.read<uint32_t>("Nj - number of points along a meridian");
+      context_.n_i = reader_.read<uint32_t>("Ni - number of points along a parallel");
+      context_.n_j = reader_.read<uint32_t>("Nj - number of points along a meridian");
       reader_.read<uint32_t>("Basic angle of the initial production domain");
       reader_.read<uint32_t>("Subdivisions of basic angle used to define extreme longitudes and latitudes, and direction increments");
-      ctx_.la_1 = reader_.read<uint32_t>("La1 - latitude of first grid point") * 0.000001;
-      ctx_.lo_1 = reader_.read<uint32_t>("Lo1 - longitude of first grid point") * 0.000001;
+      context_.la_1 = reader_.read<uint32_t>("La1 - latitude of first grid point") * 0.000001;
+      context_.lo_1 = reader_.read<uint32_t>("Lo1 - longitude of first grid point") * 0.000001;
       reader_.read<uint8_t>("Resolution and component flags");
-      ctx_.la_2 = reader_.read<uint32_t>("La2 - latitude of last grid point") * 0.000001;
-      ctx_.lo_2 = reader_.read<uint32_t>("Lo2 - longitude of last grid point") * 0.000001;
-      ctx_.d_i = reader_.read<uint32_t>("Di - i direction increment") * 0.000001;
-      ctx_.d_j = reader_.read<uint32_t>("Dj - j direction increment") * 0.000001;
+      context_.la_2 = reader_.read<uint32_t>("La2 - latitude of last grid point") * 0.000001;
+      context_.lo_2 = reader_.read<uint32_t>("Lo2 - longitude of last grid point") * 0.000001;
+      context_.d_i = reader_.read<uint32_t>("Di - i direction increment") * 0.000001;
+      context_.d_j = reader_.read<uint32_t>("Dj - j direction increment") * 0.000001;
       reader_.read<uint8_t>("Scanning mode");
       reader_.skip(section_size_ - 72);
     }
@@ -225,8 +204,8 @@ namespace simpatico {
     // (1,1) => Relative humidity [%]
 
     void read_product_definition_template0_or_template8_() {
-      ctx_.parameter_category = reader_.read<uint8_t>("Parameter category");
-      ctx_.parameter_number = reader_.read<uint8_t>("Parameter number");
+      context_.parameter_category = reader_.read<uint8_t>("Parameter category");
+      context_.parameter_number = reader_.read<uint8_t>("Parameter number");
 
       reader_.read<uint8_t>("Type of generating process");
       reader_.read<uint8_t>("Background generating process identifier");
@@ -236,15 +215,15 @@ namespace simpatico {
 
       int unit = reader_.read<uint8_t>("Indicator of unit of time range");
       BOOST_ASSERT(unit == 1);
-      ctx_.forecast_time = reader_.read<uint32_t>("Forecast time in units defined by octet 18") * 3600.0;
+      context_.forecast_time = reader_.read<uint32_t>("Forecast time in units defined by octet 18") * 3600.0;
 
-      ctx_.surface_type = reader_.read<uint8_t>("Type of first fixed surface");
+      context_.surface_type = reader_.read<uint8_t>("Type of first fixed surface");
       double f = reader_.read_1s_complement<int8_t>("Scale factor of first fixed surface");
       double v = reader_.read<uint32_t>("Scaled value of first fixed surface");
-      if (ctx_.surface_type == 100) {
-        ctx_.surface_value = v * pow(10, -f);
+      if (context_.surface_type == 100) {
+        context_.surface_value = v * pow(10, -f);
       } else {
-        ctx_.surface_value = 0;
+        context_.surface_value = 0;
       }
 
       reader_.read<uint8_t>("Type of second fixed surface");
@@ -290,9 +269,9 @@ namespace simpatico {
 
     // Template 5.0
     void read_data_representation_template0_() {
-      ctx_.r = reader_.read<float>("Reference value");
-      ctx_.e = reader_.read_1s_complement<int16_t>("Binary scale factor");
-      ctx_.d = reader_.read_1s_complement<int16_t>("Decimal scale factor");
+      context_.r = reader_.read<float>("Reference value");
+      context_.e = reader_.read_1s_complement<int16_t>("Binary scale factor");
+      context_.d = reader_.read_1s_complement<int16_t>("Decimal scale factor");
 
       int bits = reader_.read<uint8_t>("Number of bits used for each packed value for simple packing, or for each group reference value for complex packing or spatial differencing");
       BOOST_ASSERT(bits == 12);
@@ -327,22 +306,22 @@ namespace simpatico {
       std::vector<uint8_t> buffer(section_size_ - 5);
       reader_.read_buffer(buffer);
 
-      std::vector<double> data(ctx_.n_i * ctx_.n_j);
-      for (size_t j = 0; j < ctx_.n_j; ++j) {
-        for (size_t i = 0; i < ctx_.n_i; ++i) {
-          int bit_index = (i + j * ctx_.n_i) * 12;
+      std::vector<double> data(context_.n_i * context_.n_j);
+      for (uint32_t j = 0; j < context_.n_j; ++j) {
+        for (uint32_t i = 0; i < context_.n_i; ++i) {
+          int bit_index = (i + j * context_.n_i) * 12;
           double value;
           if (bit_index % 8 == 0) {
             value = buffer[bit_index / 8] << 4 | buffer[bit_index / 8 + 1] >> 4;
           } else {
             value = (buffer[bit_index / 8] & 0x0F) << 8 | buffer[bit_index / 8 + 1];
           }
-          data[i + j * ctx_.n_i]
-            = (ctx_.r + value * pow(2, ctx_.e)) / pow(10, ctx_.d);
+          data[i + j * context_.n_i]
+            = (context_.r + value * pow(2, context_.e)) / pow(10, context_.d);
         }
       }
 
-      function_(ctx_, data);
+      function_(context_, data);
     }
   };
 }

@@ -10,7 +10,7 @@ FLUID       = $(PREFIX)/bin/fluid
 
 LOADLIBES = \
 	$(shell $(FLTK_CONFIG) --use-gl --use-images --ldstaticflags) \
-	$(PREFIX)/lib/libboost_serialization.a
+	$(PREFIX)/lib/libboost_program_options.a
 
 ifeq ($(MODE),test)
 CPPFLAGS += -DBOOST_TEST_MAIN
@@ -19,7 +19,7 @@ SOURCE = $(wildcard test_*.cpp)
 endif
 
 ifeq ($(MODE),main)
-SOURCE = viewer.cpp
+SOURCE = pregrid_msm.cpp viewer.cpp
 endif
 
 TARGET = $(SOURCE:.cpp=)

@@ -13,6 +13,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/swap.hpp>
 #include "image.hpp"
+#include "msm_context.hpp"
 #include "msm_reader.hpp"
 
 namespace simpatico {
@@ -56,54 +57,54 @@ namespace simpatico {
       return std::string();
     }
 
-    inline void read_cb(
+    inline void read_images_cb(
         std::vector<boost::shared_ptr<image> >& images,
-        msm_reader::context const& ctx,
+        msm_context const& context,
         std::vector<double> const& data) {
 
       boost::posix_time::ptime reference_time
-        = boost::posix_time::ptime_from_tm(ctx.reference_time);
-      reference_time += boost::posix_time::seconds(ctx.forecast_time);
+        = boost::posix_time::ptime_from_tm(context.reference_time);
+      reference_time += boost::posix_time::seconds(context.forecast_time);
 
       std::ostringstream name;
       name << boost::posix_time::to_iso_extended_string(reference_time);
-      if (ctx.surface_type == 100) {
-        name << " " << ctx.surface_value;
+      if (context.surface_type == 100) {
+        name << " " << context.surface_value;
       }
-      name << " " << parameter(ctx.parameter_category, ctx.parameter_number);
+      name << " " << parameter(context.parameter_category, context.parameter_number);
 
       boost::shared_ptr<simpatico::image> image
         = boost::make_shared<simpatico::image>(
             name.str(),
-            vm::Point2d(ctx.lo_1, ctx.la_1),
-            vm::Point2d(ctx.lo_2, ctx.la_2),
-            vm::Tuple2i(ctx.n_i, ctx.n_j),
+            vm::Point2d(context.lo_1, context.la_1),
+            vm::Point2d(context.lo_2, context.la_2),
+            vm::Tuple2i(context.n_i, context.n_j),
             data);
 
       image->meta_add(
           "reference_time",
           boost::posix_time::to_iso_extended_string(reference_time));
-      image->meta_add("n_i", ctx.n_i);
-      image->meta_add("n_j", ctx.n_j);
-      image->meta_add("la_1", ctx.la_1);
-      image->meta_add("lo_1", ctx.lo_1);
-      image->meta_add("la_2", ctx.la_2);
-      image->meta_add("lo_2", ctx.lo_2);
-      image->meta_add("d_i", ctx.d_i);
-      image->meta_add("d_j", ctx.d_j);
-      image->meta_add("parameter_category", ctx.parameter_category);
-      image->meta_add("parameter_number", ctx.parameter_number);
-      image->meta_add("forecast_time", ctx.forecast_time);
-      image->meta_add("surface_type", ctx.surface_type);
-      image->meta_add("surface_value", ctx.surface_value);
-      image->meta_add("r", ctx.r);
-      image->meta_add("e", ctx.e);
-      image->meta_add("d", ctx.d);
+      image->meta_add("n_i", context.n_i);
+      image->meta_add("n_j", context.n_j);
+      image->meta_add("la_1", context.la_1);
+      image->meta_add("lo_1", context.lo_1);
+      image->meta_add("la_2", context.la_2);
+      image->meta_add("lo_2", context.lo_2);
+      image->meta_add("d_i", context.d_i);
+      image->meta_add("d_j", context.d_j);
+      image->meta_add("parameter_category", context.parameter_category);
+      image->meta_add("parameter_number", context.parameter_number);
+      image->meta_add("forecast_time", context.forecast_time);
+      image->meta_add("surface_type", context.surface_type);
+      image->meta_add("surface_value", context.surface_value);
+      image->meta_add("r", context.r);
+      image->meta_add("e", context.e);
+      image->meta_add("d", context.d);
 
       images.push_back(image);
     }
 
-    inline bool read(
+    inline bool read_images(
         std::string const& path,
         std::vector<boost::shared_ptr<image> >& target) {
       std::ifstream in(path.c_str(), std::ios::in | std::ios::binary);
@@ -112,7 +113,8 @@ namespace simpatico {
       }
 
       std::vector<boost::shared_ptr<image> > source;
-      msm_reader reader(in, boost::bind(read_cb, boost::ref(source), _1, _2));
+      msm_reader reader(
+          in, boost::bind(read_images_cb, boost::ref(source), _1, _2));
       reader.read();
       boost::swap(source, target);
       return true;

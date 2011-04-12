@@ -1,11 +1,12 @@
 #include <fstream>
 #include <vector>
 #include <boost/test/unit_test.hpp>
+#include "pregrid_context.hpp"
 #include "pregrid_reader.hpp"
 
 namespace {
   inline void read_cb(
-      simpatico::pregrid_reader::context const& ctx,
+      simpatico::pregrid_context const& context,
       std::vector<float> const& data) {
   }
 

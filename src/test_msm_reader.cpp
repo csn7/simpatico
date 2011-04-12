@@ -1,11 +1,12 @@
 #include <fstream>
 #include <vector>
 #include <boost/test/unit_test.hpp>
+#include "msm_context.hpp"
 #include "msm_reader.hpp"
 
 namespace {
   inline void read_cb(
-      simpatico::msm_reader::context const& ctx,
+      simpatico::msm_context const& context,
       std::vector<double> const& data) {}
 
   BOOST_AUTO_TEST_CASE(test_msm_reader0) {

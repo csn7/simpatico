@@ -12,58 +12,63 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/swap.hpp>
 #include "image.hpp"
+#include "pregrid_context.hpp"
 #include "pregrid_reader.hpp"
 #include "trim.hpp"
 #include "vecmath.hpp"
 
 namespace simpatico {
   namespace pregrid {
-    inline void read_cb(
+    inline void read_images_cb(
         std::vector<boost::shared_ptr<image> >& images,
-        pregrid_reader::context const& ctx,
+        pregrid_context const& context,
         std::vector<float> const& data) {
       std::ostringstream name;
-      name << trim(ctx.hdate) << " " << ctx.xlvl << " " << trim(ctx.desc);
+      name << trim(context.hdate)
+          << " " << context.xlvl
+          << " " << trim(context.desc);
 
       vm::Point2d start;;
       vm::Point2d ended;
-      if (ctx.iproj == 0) {
+      if (context.iproj == 0) {
         // [LNG], [LAT]
-        start.set(ctx.startlon, ctx.startlat);
-        ended.set(ctx.deltalon * (ctx.nx -1), ctx.deltalat * (ctx.ny - 1));
+        start.set(context.startlon, context.startlat);
+        ended.set(
+            context.deltalon * (context.nx - 1),
+            context.deltalat * (context.ny - 1));
         ended.add(start);
       } else {
         // [km]
-        ended.set(ctx.dx * (ctx.nx - 1), ctx.dy * (ctx.ny - 1));
+        ended.set(context.dx * (context.nx - 1), context.dy * (context.ny - 1));
       }
       boost::shared_ptr<simpatico::image> image
         = boost::make_shared<simpatico::image>(
-            name.str(), start, ended, vm::Tuple2i(ctx.nx, ctx.ny), data);
+            name.str(), start, ended, vm::Tuple2i(context.nx, context.ny), data);
 
-      image->meta_add("ifv",      ctx.ifv);
-      image->meta_add("hdate",    ctx.hdate);
-      image->meta_add("xcfst",    ctx.xcfst);
-      image->meta_add("field",    ctx.field);
-      image->meta_add("units",    ctx.units);
-      image->meta_add("desc",     ctx.desc);
-      image->meta_add("xlvl",     ctx.xlvl);
-      image->meta_add("nx",       ctx.nx);
-      image->meta_add("ny",       ctx.ny);
-      image->meta_add("iproj",    ctx.iproj);
-      image->meta_add("startlat", ctx.startlat);
-      image->meta_add("startlon", ctx.startlon);
-      image->meta_add("deltalat", ctx.deltalat);
-      image->meta_add("deltalat", ctx.deltalon);
-      image->meta_add("dx",       ctx.dx);
-      image->meta_add("dy",       ctx.dy);
-      image->meta_add("xlonc",    ctx.xlonc);
-      image->meta_add("truelat1", ctx.truelat1);
-      image->meta_add("truelat2", ctx.truelat2);
+      image->meta_add("ifv",      context.ifv);
+      image->meta_add("hdate",    context.hdate);
+      image->meta_add("xcfst",    context.xcfst);
+      image->meta_add("field",    context.field);
+      image->meta_add("units",    context.units);
+      image->meta_add("desc",     context.desc);
+      image->meta_add("xlvl",     context.xlvl);
+      image->meta_add("nx",       context.nx);
+      image->meta_add("ny",       context.ny);
+      image->meta_add("iproj",    context.iproj);
+      image->meta_add("startlat", context.startlat);
+      image->meta_add("startlon", context.startlon);
+      image->meta_add("deltalat", context.deltalat);
+      image->meta_add("deltalat", context.deltalon);
+      image->meta_add("dx",       context.dx);
+      image->meta_add("dy",       context.dy);
+      image->meta_add("xlonc",    context.xlonc);
+      image->meta_add("truelat1", context.truelat1);
+      image->meta_add("truelat2", context.truelat2);
 
       images.push_back(image);
     }
 
-    inline bool read(
+    inline bool read_images(
         std::string const& path,
         std::vector<boost::shared_ptr<image> >& target) {
       std::ifstream in(path.c_str(), std::ios::in | std::ios::binary);
@@ -73,7 +78,7 @@ namespace simpatico {
 
       std::vector<boost::shared_ptr<image> > source;
       pregrid_reader reader(
-          in, boost::bind(read_cb, boost::ref(source), _1, _2));
+          in, boost::bind(read_images_cb, boost::ref(source), _1, _2));
       reader.read();
       boost::swap(source, target);
       return true;

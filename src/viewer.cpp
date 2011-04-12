@@ -134,7 +134,7 @@ public:
       if (! path) {
         return;
       }
-      if (! simpatico::msm::read(*path, images_)) {
+      if (! simpatico::msm::read_images(*path, images_)) {
         return;
       }
       initialize_image_(*path);
@@ -149,7 +149,7 @@ public:
       if (! path) {
         return;
       }
-      if (! simpatico::pregrid::read(*path, images_)) {
+      if (! simpatico::pregrid::read_images(*path, images_)) {
         return;
       }
       initialize_image_(*path);
