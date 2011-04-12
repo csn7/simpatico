@@ -18,6 +18,7 @@
 #include <FL/gl_draw.H>
 #include "assert.hpp"
 #include "chooser.hpp"
+#include "dailysst.hpp"
 #include "msm.hpp"
 #include "pregrid.hpp"
 #include "ui_color.hpp"
@@ -142,6 +143,22 @@ public:
       fl_alert("%s", e.what());
     }
   }
+
+  void open_dailysst() {
+    try {
+      boost::optional<std::string> path = simpatico::chooser::browse_file();
+      if (! path) {
+        return;
+      }
+      if (! simpatico::dailysst::read_images(*path, images_)) {
+        return;
+      }
+      initialize_image_(*path);
+    } catch (std::exception const& e) {
+      fl_alert("%s", e.what());
+    }
+  }
+
 
   void open_pregrid() {
     try {

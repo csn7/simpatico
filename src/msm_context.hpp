@@ -1,6 +1,7 @@
 #ifndef SIMPATICO_MSM_CONTEXT_HPP
 #define SIMPATICO_MSM_CONTEXT_HPP
 
+#include <stdint.h>
 #include <time.h>
 
 namespace simpatico {

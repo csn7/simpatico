@@ -3,7 +3,9 @@
 
 #include <math.h>
 #include <stdint.h>
+#include <string.h>
 #include <iostream>
+#include <vector>
 #include <boost/noncopyable.hpp>
 #include <boost/function.hpp>
 #include "assert.hpp"
@@ -23,7 +25,7 @@ namespace simpatico {
       : reader_(in, trace), function_(function) {}
 
     void read() {
-      std::streampos size = read_indicator_section_() - 4;
+      uint64_t size = read_indicator_section_() - 4;
       while (reader_.position() < size) {
         read_section_();
       }

@@ -2,16 +2,19 @@
 #define SIMPATICO_MSM_HPP
 
 #include <iostream>
-#include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/iostreams/device/file.hpp>
+#include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/ref.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/swap.hpp>
+#include <boost/xpressive/xpressive.hpp>
 #include "image.hpp"
 #include "msm_context.hpp"
 #include "msm_reader.hpp"
@@ -107,14 +110,20 @@ namespace simpatico {
     inline bool read_images(
         std::string const& path,
         std::vector<boost::shared_ptr<image> >& target) {
-      std::ifstream in(path.c_str(), std::ios::in | std::ios::binary);
-      if (! in) {
-        return false;
+      using boost::xpressive::eos;
+      using boost::xpressive::icase;
+
+      static boost::xpressive::sregex const regex(icase(".bz2") >> eos);
+
+      boost::iostreams::filtering_istream in;
+      if (boost::xpressive::regex_search(path, regex)) {
+        in.push(boost::iostreams::bzip2_decompressor());
       }
+      in.push(boost::iostreams::file_source(path, std::ios::in | std::ios::binary));
 
       std::vector<boost::shared_ptr<image> > source;
       msm_reader reader(
-          in, boost::bind(read_images_cb, boost::ref(source), _1, _2));
+          in, boost::bind(read_images_cb, boost::ref(source), _1, _2), &std::cout);
       reader.read();
       boost::swap(source, target);
       return true;

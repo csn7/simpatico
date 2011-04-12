@@ -1,6 +1,7 @@
 #ifndef SIMPATICO_READER_HPP
 #define SIMPATICO_READER_HPP
 
+#include <stddef.h>
 #include <stdint.h>
 #include <iostream>
 #include <string>
@@ -17,13 +18,13 @@ namespace simpatico {
   class reader : boost::noncopyable {
   public:
     explicit reader(std::istream& in, std::ostream* trace = 0)
-      : in_(in), trace_(trace) {}
+      : in_(in), trace_(trace), position_() {}
 
     template <typename T>
     T read(char const* name = 0) {
       BOOST_STATIC_ASSERT(boost::is_fundamental<T>::value);
       unsafe_cast<T> cast;
-      in_.read(cast.data(), cast.size());
+      read_(cast.data(), cast.size());
       endian<T_is_big_endian>::swap(cast.begin(), cast.end());
 
       if (trace_ && name) {
@@ -63,7 +64,7 @@ namespace simpatico {
     template <typename T>
     void read_buffer(std::vector<T>& buffer) {
       BOOST_STATIC_ASSERT(sizeof(T) == 1);
-      in_.read(reinterpret_cast<char*>(&buffer[0]), buffer.size());
+      read_(reinterpret_cast<char*>(&buffer[0]), buffer.size());
     }
 
     std::string read_string(size_t size, char const* name = 0) {
@@ -81,15 +82,22 @@ namespace simpatico {
       return in_.eof();
     }
 
-    std::streampos position() const {
-      return in_.tellg();
+    size_t position() const {
+      // can not use peekg...
+      return position_;
     }
 
-    void skip(std::streampos offset) {
-      in_.seekg(offset, std::ios::cur);
+    void skip(size_t size) {
+      // can not use seekg...
+      if (size > 0) {
+        for (size_t i = 0; i < size; ++i) {
+          char c = 0;
+          read_(&c, 1);
+        }
+      }
 
       if (trace_) {
-        *trace_ << "| [skip] " << offset << "\n";
+        *trace_ << "| [skip] " << size << "\n";
       }
     }
 
@@ -100,6 +108,12 @@ namespace simpatico {
   private:
     std::istream& in_;
     std::ostream* trace_;
+    size_t position_;
+
+    void read_(char* buffer, size_t size) {
+      in_.read(buffer, size);
+      position_ += size;
+    }
   };
 }
 

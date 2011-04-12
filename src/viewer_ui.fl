@@ -21,6 +21,11 @@ Function {make_window()} {open
           xywh {0 0 31 20} shortcut 0x40006d
         }
         MenuItem {} {
+          label {Open &DAILYSST}
+          callback {app.open_dailysst();} selected
+          xywh {0 0 31 20} shortcut 0x400064
+        }
+        MenuItem {} {
           label {Open &Pregrid}
           callback {app.open_pregrid();}
           xywh {0 0 31 20} shortcut 0x400070
@@ -81,7 +86,7 @@ Function {make_window()} {open
         simpatico::ui_color::linear,
         vm::Color4d(0, 0, 0, 1),
         vm::Color4d(1, 1, 1, 1),
-        _1, _2, _3));} selected
+        _1, _2, _3));}
               xywh {0 0 31 20}
             }
           }
