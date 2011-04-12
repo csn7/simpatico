@@ -27,7 +27,19 @@ namespace simpatico {
 
       std::vector<double> image_data;
       BOOST_FOREACH(int i, data) {
-        image_data.push_back(i * 0.1);
+        switch (i) {
+          case 777:
+            image_data.push_back(-10);
+            break;
+          case 888:
+            image_data.push_back(-20);
+            break;
+          case 999:
+            image_data.push_back(-30);
+            break;
+          default:
+            image_data.push_back(i * 0.1);
+        }
       }
 
       boost::shared_ptr<simpatico::image> image
