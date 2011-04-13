@@ -1,1 +1,17 @@
-SEE: http://csn7.com/wiki/
+simpatico - moyu@csn7.com
+
+1. はじめに
+
+http://csn7.com/wiki/ を参照。
+
+2. ライセンス
+
+GPLv2。
+
+3. ビルド
+
+srclibの下に依存ライブラリが配置してある。
+
+4. テストデータ
+
+http://csn7.com/wiki/?page=simpatico からダウンロードできる。
