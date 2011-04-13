@@ -1,0 +1,11 @@
+#! /bin/sh -e
+
+prefix=`cd _prefix && pwd`
+name=expat-2.0.1
+
+cd _build
+gunzip -c "../archive/$name.tar.gz" | tar xf -
+cd "$name"
+./configure --prefix "$prefix"
+make
+make install
