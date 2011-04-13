@@ -6,5 +6,14 @@ name=boost_1_46_1
 cd _build
 bunzip2 -c "../archive/$name.tar.bz2" | tar xf -
 cd "$name"
-./bootstrap.sh --prefix="$prefix"
-./bjam install || true # ignore error
+./bootstrap.sh \
+  --with-libraries=iostreams,program_options,test \
+  --prefix="$prefix"
+./bjam \
+  -sBZIP2_BINARY="bz2_static" \
+  -sBZIP2_INCLUDE="$prefix/include" \
+  -sBZIP2_LIBPATH="$prefix/lib" \
+  -sZLIB_BINARY="fltk_z" \
+  -sZLIB_INCLUDE="$prefix/include/FL/images" \
+  -sZLIB_LIBPATH="$prefix/lib" \
+  link=static install || true # ignore error

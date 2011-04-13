@@ -12,7 +12,7 @@ LOADLIBES = \
 	$(shell $(FLTK_CONFIG) --use-gl --use-images --ldstaticflags) \
 	$(PREFIX)/lib/libboost_iostreams.a \
 	$(PREFIX)/lib/libboost_program_options.a \
-	-lbz2
+	$(PREFIX)/lib/libbz2_static.a
 
 ifeq ($(MODE),test)
 CPPFLAGS += -DBOOST_TEST_MAIN

@@ -1,7 +1,8 @@
 all::
 	mkdir -p _build _prefix
-	package/boost
+	package/bzip2
 	package/fltk
+	package/boost
 	package/vecmath-c++
 
 clean::

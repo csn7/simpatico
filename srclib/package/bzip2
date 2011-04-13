@@ -1,0 +1,14 @@
+#! /bin/sh -e
+
+prefix=`cd _prefix && pwd`
+name=bzip2-1.0.6
+
+cd _build
+gunzip -c "../archive/$name.tar.gz" | tar xf -
+cd "$name"
+make
+make install PREFIX="$prefix"
+cd "$prefix/lib"
+
+cp -f libbz2.a libbz2_static.a
+ranlib libbz2_static.a
