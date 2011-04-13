@@ -11,7 +11,9 @@ namespace {
   }
 
   BOOST_AUTO_TEST_CASE(test_pregrid_reader) {
-    std::ifstream in("../data/ON84:1993-03-13_00", std::ios::in | std::ios::binary);
+    std::ifstream in(
+        "../test_data/pregrid/ON84:1993-03-13_00",
+        std::ios::in | std::ios::binary);
     simpatico::pregrid_reader reader(in, read_cb);
     reader.read();
   }
