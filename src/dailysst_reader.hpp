@@ -20,8 +20,8 @@ namespace simpatico {
 
     explicit dailysst_reader(std::istream& in, function_type const& function)
       : in_(in), function_(function) {
-      context_.start.set(120.125, 49.875);
-      context_.ended.set(159.875, 20.125);
+      context_.start.set(120, 50);
+      context_.ended.set(160, 20);
       context_.size.set(160, 120);
     }
 

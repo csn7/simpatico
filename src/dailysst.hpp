@@ -48,7 +48,8 @@ namespace simpatico {
             context.start,
             context.ended,
             context.size,
-            image_data);
+            image_data,
+            false);
 
       image->meta_add("time",  boost::posix_time::to_iso_extended_string(time));
       image->meta_add("start", boost::lexical_cast<std::string>(context.start));

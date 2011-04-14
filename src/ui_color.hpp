@@ -8,11 +8,17 @@ namespace simpatico {
     inline vm::Color4b linear(
         vm::Color4d const& color0,
         vm::Color4d const& color1,
-        double value, double min, double max) {
-      vm::Color4d color;
-      color.interpolate(color0, color1, (value - min) / (max - min));
-      return vm::Color4b(
-          color.x * 255, color.y * 255, color.z * 255, color.w * 255);
+        double value,
+        double min,
+        double max) {
+      if (min == max) {
+        return vm::Color4b(255, 255, 255, 127);
+      } else {
+        vm::Color4d color;
+        color.interpolate(color0, color1, (value - min) / (max - min));
+        return vm::Color4b(
+            color.x * 255, color.y * 255, color.z * 255, color.w * 255);
+      }
     }
   }
 }

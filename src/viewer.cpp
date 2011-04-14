@@ -249,6 +249,10 @@ private:
               boost::xpressive::regex_constants::format_perl).c_str(), 0, 0);
     }
     image_meta->clear();
+
+    // update ui
+    image_name->value(0);
+    select_image_name();
   }
 };
 
