@@ -4,6 +4,7 @@
 #include <math.h>
 #include <algorithm>
 #include <boost/array.hpp>
+#include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 #include <FL/Fl.H>
 #include <FL/gl.H>
@@ -13,15 +14,37 @@
 namespace simpatico {
   class ui_opengl_camera2d : boost::noncopyable {
   public:
+    typedef boost::function<void ()> function_type;
+
     explicit ui_opengl_camera2d()
       : radius_(1), center_(), eye_(0, 0, 1), up_(0, 1, 0) {}
+
+    void function(function_type const& function) {
+      function_ = function;
+    }
+
+    function_type const& function() const {
+      return function_;
+    }
+
+    void radius(double radius) {
+      radius_ = radius;
+    }
 
     double radius() const {
       return radius_;
     }
 
+    void center(vm::Point3d const& center) {
+      center_ = center;
+    }
+
     vm::Point3d const& center() const {
       return center_;
+    }
+
+    void eye(vm::Point3d const& eye) {
+      eye_ = eye;
     }
 
     vm::Point3d const& eye() const {
@@ -40,6 +63,7 @@ namespace simpatico {
       radius_ = start.distance(ended) * 0.5;
       center_.set(center.x, center.y, 0);
       eye_.set(center.x, center.y, 1);
+      notify_();
     }
 
     int handle_opengl(int event) {
@@ -53,11 +77,13 @@ namespace simpatico {
         case FL_DRAG:
           if (Fl::event_button() == FL_LEFT_MOUSE) {
             mouse_drag_();
+            notify_();
             return 1;
           }
           break;
         case FL_MOUSEWHEEL:
           radius_ *= pow(0.99, -Fl::event_dy());
+          notify_();
           return 1;
       }
       return 0;
@@ -76,6 +102,7 @@ namespace simpatico {
     }
 
   private:
+    function_type function_;
     double radius_;
     vm::Point3d center_;
     vm::Point3d eye_;
@@ -100,6 +127,12 @@ namespace simpatico {
               0),
           &target);
       return target;
+    }
+
+    void notify_() {
+      if (function_) {
+        function_();
+      }
     }
 
     void mouse_push_() {

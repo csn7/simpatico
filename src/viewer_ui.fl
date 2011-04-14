@@ -41,46 +41,52 @@ Function {make_window()} {open
           xywh {0 0 31 20} shortcut 0x400071
         }
       }
+      Submenu {} {
+        label {&Window} open
+        xywh {0 0 62 20}
+      } {
+        MenuItem {} {
+          label {Default &Sidebar Width}
+          callback {sidebar->size(300, sidebar->h());} selected
+          xywh {0 0 31 20}
+        }
+      }
     }
     Fl_Tile {} {open
       xywh {0 25 800 500} resizable
     } {
-      Fl_Group opengl_window {open selected
+      Fl_Group opengl_window {open
         xywh {0 25 500 500}
         class {simpatico::ui_opengl_window}
       } {}
-      Fl_Tabs {} {
+      Fl_Tabs sidebar {open
         xywh {500 25 300 500}
       } {
         Fl_Group {} {
-          label Camera open
+          label {Camera 2d} open
           xywh {500 50 300 475} resizable
         } {
           Fl_Value_Input camera2d_radius {
             label {Radius:}
+            callback {app.update_camera2d();}
             xywh {575 55 100 25}
           }
           Fl_Value_Input camera2d_center_x {
             label {Center: X:}
+            callback {app.update_camera2d();}
             xywh {575 85 100 25}
           }
           Fl_Value_Input camera2d_center_y {
             label {Y:}
+            callback {app.update_camera2d();}
             xywh {695 85 100 25}
           }
-          Fl_Value_Input camera2d_eye_x {
-            label {Eye: X:}
-            xywh {575 115 100 25}
-          }
-          Fl_Value_Input camera2d_eye_y {
-            label {Y:}
-            xywh {695 115 100 25}
-          }
           Fl_Group {} {open
-            xywh {505 145 290 345} resizable
+            xywh {505 115 290 375} resizable
           } {}
           Fl_Button {} {
-            label Reset
+            label {Reset Camera 2d}
+            callback {app.reset_camera2d();}
             xywh {505 495 290 25}
           }
         }

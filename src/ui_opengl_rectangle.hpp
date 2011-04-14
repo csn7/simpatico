@@ -43,7 +43,6 @@ namespace simpatico {
 
       if (is_first_) {
         is_first_ = false;
-        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glTexParameteri(
             GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(
@@ -53,6 +52,7 @@ namespace simpatico {
             GL_RGBA, size_.x, size_.y, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, &data_[0]);
       }
+      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
       vm::TexCoord2d t0;
       vm::TexCoord2d t1(size_.x, size_.y);

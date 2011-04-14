@@ -57,18 +57,11 @@ public:
         boost::bind(
             &application::draw_image_meta_cell,
             this, _1, _2, _3, _4, _5, _6, _7));
+    camera2d_.function(
+        boost::bind(
+            &application::notify_camera2d,
+            this));
     return Fl::run();
-  }
-
-  int handle_opengl(int event) {
-    {
-      int const result = camera2d_.handle_opengl(event);
-      if (result != 0) {
-        opengl_window->redraw();
-        return result;
-      }
-    }
-    return 0;
   }
 
   void draw_opengl() {
@@ -105,6 +98,17 @@ public:
     glFinish();
   }
 
+  int handle_opengl(int event) {
+    {
+      int const result = camera2d_.handle_opengl(event);
+      if (result != 0) {
+        opengl_window->redraw();
+        return result;
+      }
+    }
+    return 0;
+  }
+
   void draw_image_meta_cell(
       Fl_Table::TableContext ctx, int r, int c, int x, int y, int w, int h) {
     static int const padding = 2;
@@ -127,6 +131,12 @@ public:
           x + padding, y, w - padding, h, FL_ALIGN_LEFT);
       fl_pop_clip();
     }
+  }
+
+  void notify_camera2d() {
+    camera2d_radius->value(camera2d_.radius());
+    camera2d_center_x->value(camera2d_.center().x);
+    camera2d_center_y->value(camera2d_.center().y);
   }
 
   void open_msm() {
@@ -159,7 +169,6 @@ public:
     }
   }
 
-
   void open_pregrid() {
     try {
       boost::optional<std::string> path = simpatico::chooser::browse_file();
@@ -181,6 +190,28 @@ public:
       return;
     }
     opengl_window->save_screenshot(*path);
+  }
+
+  void update_camera2d() {
+    camera2d_.radius(camera2d_radius->value());
+    camera2d_.center(
+        vm::Point3d(
+            camera2d_center_x->value(),
+            camera2d_center_y->value(),
+            camera2d_.center().z));
+    camera2d_.eye(
+        vm::Point3d(
+            camera2d_center_x->value(),
+            camera2d_center_y->value(),
+            camera2d_.eye().z));
+    opengl_window->redraw();
+  }
+
+  void reset_camera2d() {
+    if (image_) {
+      camera2d_.reset(image_->start(), image_->ended());
+      opengl_window->redraw();
+    }
   }
 
   void select_image_name() {

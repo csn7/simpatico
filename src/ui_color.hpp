@@ -12,7 +12,7 @@ namespace simpatico {
         double min,
         double max) {
       if (min == max) {
-        return vm::Color4b(255, 255, 255, 127);
+        return vm::Color4b(255, 0, 0, 32);
       } else {
         vm::Color4d color;
         color.interpolate(color0, color1, (value - min) / (max - min));
