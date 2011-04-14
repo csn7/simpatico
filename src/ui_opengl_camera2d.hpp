@@ -16,6 +16,22 @@ namespace simpatico {
     explicit ui_opengl_camera2d()
       : radius_(1), center_(), eye_(0, 0, 1), up_(0, 1, 0) {}
 
+    double radius() const {
+      return radius_;
+    }
+
+    vm::Point3d const& center() const {
+      return center_;
+    }
+
+    vm::Point3d const& eye() const {
+      return eye_;
+    }
+
+    vm::Vector3d const& up() const {
+      return up_;
+    }
+
     void reset(vm::Point2d const& start, vm::Point2d const& ended) {
       vm::Point2d center(start);
       center.add(ended);

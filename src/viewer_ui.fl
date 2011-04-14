@@ -6,7 +6,7 @@ Function {make_window()} {open
 } {
   Fl_Window window {
     label {simpatico - viewer} open
-    xywh {16 182 800 525} type Double resizable visible
+    xywh {16 176 800 525} type Double resizable visible
   } {
     Fl_Menu_Bar {} {open
       xywh {0 0 800 25}
@@ -22,7 +22,7 @@ Function {make_window()} {open
         }
         MenuItem {} {
           label {Open &DAILYSST}
-          callback {app.open_dailysst();} selected
+          callback {app.open_dailysst();}
           xywh {0 0 31 20} shortcut 0x400064
         }
         MenuItem {} {
@@ -45,16 +45,48 @@ Function {make_window()} {open
     Fl_Tile {} {open
       xywh {0 25 800 500} resizable
     } {
-      Fl_Group opengl_window {open
+      Fl_Group opengl_window {open selected
         xywh {0 25 500 500}
         class {simpatico::ui_opengl_window}
       } {}
-      Fl_Tabs {} {open
+      Fl_Tabs {} {
         xywh {500 25 300 500}
       } {
         Fl_Group {} {
-          label Image open
+          label Camera open
           xywh {500 50 300 475} resizable
+        } {
+          Fl_Value_Input camera2d_radius {
+            label {Radius:}
+            xywh {575 55 100 25}
+          }
+          Fl_Value_Input camera2d_center_x {
+            label {Center: X:}
+            xywh {575 85 100 25}
+          }
+          Fl_Value_Input camera2d_center_y {
+            label {Y:}
+            xywh {695 85 100 25}
+          }
+          Fl_Value_Input camera2d_eye_x {
+            label {Eye: X:}
+            xywh {575 115 100 25}
+          }
+          Fl_Value_Input camera2d_eye_y {
+            label {Y:}
+            xywh {695 115 100 25}
+          }
+          Fl_Group {} {open
+            xywh {505 145 290 345} resizable
+          } {}
+          Fl_Button {} {
+            label Reset
+            xywh {505 495 290 25}
+          }
+        }
+        Fl_Group {} {
+          label Image open
+          xywh {500 50 300 475} hide
         } {
           Fl_Output image_path {
             label {Path:}
