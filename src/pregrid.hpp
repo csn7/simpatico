@@ -78,7 +78,7 @@ namespace simpatico {
 
       std::vector<boost::shared_ptr<image> > source;
       pregrid_reader reader(
-          in, boost::bind(read_images_cb, boost::ref(source), _1, _2));
+          in, boost::bind(read_images_cb, boost::ref(source), _1, _2), &std::cout);
       reader.read();
       boost::swap(source, target);
       return true;

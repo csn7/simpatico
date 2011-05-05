@@ -123,7 +123,7 @@ namespace simpatico {
 
       std::vector<boost::shared_ptr<image> > source;
       msm_reader reader(
-          in, boost::bind(read_images_cb, boost::ref(source), _1, _2), &std::cout);
+          in, boost::bind(read_images_cb, boost::ref(source), _1, _2));
       reader.read();
       boost::swap(source, target);
       return true;

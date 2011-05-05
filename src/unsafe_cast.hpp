@@ -7,8 +7,8 @@ namespace simpatico {
   template <typename T>
   class unsafe_cast {
   public:
-    explicit unsafe_cast() {
-      data_.value = T();
+    explicit unsafe_cast(T const& value = T()) {
+      data_.value = value;
     }
 
     T const& get() const {

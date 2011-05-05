@@ -9,6 +9,11 @@
 #include <boost/program_options/variables_map.hpp>
 
 namespace {
+
+
+
+
+
 }
 
 int main(int argc, char* argv[]) {
@@ -37,17 +42,25 @@ int main(int argc, char* argv[]) {
     po::notify(variables_map);
 
     if (variables_map.count("help")) {
-      std::cout << options_description;
+      std::cout
+          << "Usage:\n"
+          << "  "
+          << argv[0]
+          << " SURFACE_MSM_FILE ISOBARIC_SURFACE_MSM_FILE -o OUTPUT_FILE\n"
+          << "\n"
+          << options_description;
       return 0;
     }
 
     bool verbose = variables_map.count("verbose") > 0;
-
     if (verbose) {
       std::cout
-          << variables_map["surface-msm-file"].as<std::string>() << "\n"
-          << variables_map["isobaric-surface-msm-file"].as<std::string>() << "\n"
-          << variables_map["output-file"].as<std::string>() << "\n";
+          << variables_map["surface-msm-file"].as<std::string>()
+          << "\n"
+          << variables_map["isobaric-surface-msm-file"].as<std::string>()
+          << "\n"
+          << variables_map["output-file"].as<std::string>()
+          << "\n";
     }
 
     return 0;
