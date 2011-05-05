@@ -7,9 +7,17 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <FL/Fl.H>
-#include <FL/gl.H>
+#include <FL/gl.h>
 #include "image.hpp"
 #include "vecmath.hpp"
+
+#if defined(GL_TEXTURE_RECTANGLE)
+#define SIMPATICO_GL_TEXTURE_RECTANGLE GL_TEXTURE_RECTANGLE
+#elif defined(GL_TEXTURE_RECTANGLE_EXT)
+#define SIMPATICO_GL_TEXTURE_RECTANGLE GL_TEXTURE_RECTANGLE_EXT
+#else
+#define SIMPATICO_GL_TEXTURE_RECTANGLE 0x84F5
+#endif
 
 namespace simpatico {
   class ui_opengl_rectangle : boost::noncopyable {
@@ -39,16 +47,16 @@ namespace simpatico {
 
     void draw_opengl() {
       glEnable(GL_TEXTURE);
-      glEnable(GL_TEXTURE_RECTANGLE_EXT);
+      glEnable(SIMPATICO_GL_TEXTURE_RECTANGLE);
 
       if (is_first_) {
         is_first_ = false;
         glTexParameteri(
-            GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            SIMPATICO_GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(
-            GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            SIMPATICO_GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexImage2D(
-            GL_TEXTURE_RECTANGLE_EXT, 0,
+            SIMPATICO_GL_TEXTURE_RECTANGLE, 0,
             GL_RGBA, size_.x, size_.y, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, &data_[0]);
       }
@@ -74,7 +82,7 @@ namespace simpatico {
       glEnd();
 
       glDisable(GL_TEXTURE);
-      glDisable(GL_TEXTURE_RECTANGLE_EXT);
+      glDisable(SIMPATICO_GL_TEXTURE_RECTANGLE);
     }
 
   public:

@@ -14,7 +14,7 @@
 #include <FL/Fl_Table.H>
 #include <FL/fl_draw.H>
 #include <FL/fl_ask.H>
-#include <FL/gl.H>
+#include <FL/gl.h>
 #include <FL/gl_draw.H>
 #include "assert.hpp"
 #include "chooser.hpp"

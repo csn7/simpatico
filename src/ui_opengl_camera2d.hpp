@@ -7,8 +7,8 @@
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 #include <FL/Fl.H>
-#include <FL/gl.H>
-#include <FL/glu.H>
+#include <FL/gl.h>
+#include <FL/glu.h>
 #include "vecmath.hpp"
 
 namespace simpatico {
