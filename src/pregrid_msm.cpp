@@ -1,20 +1,57 @@
 #include <exception>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
+#include <boost/noncopyable.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/positional_options.hpp>
 #include <boost/program_options/value_semantic.hpp>
 #include <boost/program_options/variables_map.hpp>
+#include "assert.hpp"
+#include "fortran_writer.hpp"
 
-namespace {
+class application : boost::noncopyable {
+public:
+  explicit application(
+      std::string const& surface_msm_file,
+      std::string const& isobaric_surface_msm_file,
+      std::string const& output_file,
+      std::ostream* trace = 0)
+    : surface_msm_file_(surface_msm_file),
+      isobaric_surface_msm_file_(isobaric_surface_msm_file),
+      out_(output_file.c_str(), std::ios::out | std::ios::binary),
+      writer_(out_),
+      trace_(trace) {
+      BOOST_ASSERT(out_);
+    }
 
+  void run() {
+    if (trace_) {
+      *trace_
+          << surface_msm_file_          << "\n"
+          << isobaric_surface_msm_file_ << "\n";
+    }
 
+    write_();
+  }
 
+private:
+  std::string surface_msm_file_;
+  std::string isobaric_surface_msm_file_;
+  std::ofstream out_;
+  simpatico::fortran_writer<> writer_;
+  std::ostream* trace_;
 
-
-}
+  void write_() {
+    writer_.record_start();
+    {
+      writer_.write<int32_t>(3);
+    }
+    writer_.record_ended();
+  }
+};
 
 int main(int argc, char* argv[]) {
   namespace po = boost::program_options;
@@ -52,16 +89,12 @@ int main(int argc, char* argv[]) {
       return 0;
     }
 
-    bool verbose = variables_map.count("verbose") > 0;
-    if (verbose) {
-      std::cout
-          << variables_map["surface-msm-file"].as<std::string>()
-          << "\n"
-          << variables_map["isobaric-surface-msm-file"].as<std::string>()
-          << "\n"
-          << variables_map["output-file"].as<std::string>()
-          << "\n";
-    }
+    application app(
+        variables_map["surface-msm-file"].as<std::string>(),
+        variables_map["isobaric-surface-msm-file"].as<std::string>(),
+        variables_map["output-file"].as<std::string>(),
+        variables_map.count("verbose") > 0 ? &std::cout : 0);
+    app.run();
 
     return 0;
   } catch (std::exception const& e) {
