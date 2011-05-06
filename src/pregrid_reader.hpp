@@ -96,14 +96,14 @@ namespace simpatico {
         *trace() << "========== record: 4 ==========\n";
       }
 
-      std::vector<float> slab(context_.nx * context_.ny);
+      size_t size = context_.nx * context_.ny;
+
+      std::vector<float> slab;
+      slab.reserve(size);
+
       reader_.record_start();
-      {
-        for (int32_t x = 0; x < context_.nx; ++x) {
-          for (int32_t y = 0; y < context_.ny; ++y) {
-            slab[y + x * context_.ny] = reader_.read<float>();
-          }
-        }
+      for (size_t i = 0; i < size; ++i) {
+        slab.push_back(reader_.read<float>());
       }
       reader_.record_ended();
 

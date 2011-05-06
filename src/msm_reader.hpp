@@ -308,19 +308,20 @@ namespace simpatico {
       std::vector<uint8_t> buffer(section_size_ - 5);
       reader_.read_buffer(buffer);
 
-      std::vector<double> data(context_.n_i * context_.n_j);
-      for (uint32_t j = 0; j < context_.n_j; ++j) {
-        for (uint32_t i = 0; i < context_.n_i; ++i) {
-          int bit_index = (i + j * context_.n_i) * 12;
-          double value;
-          if (bit_index % 8 == 0) {
-            value = buffer[bit_index / 8] << 4 | buffer[bit_index / 8 + 1] >> 4;
-          } else {
-            value = (buffer[bit_index / 8] & 0x0F) << 8 | buffer[bit_index / 8 + 1];
-          }
-          data[i + j * context_.n_i]
-            = (context_.r + value * pow(2, context_.e)) / pow(10, context_.d);
+      size_t size = context_.n_i * context_.n_j;
+      std::vector<double> data;
+      data.reserve(size);
+
+      size *= 12;
+      for (size_t i = 0; i < size; i += 12) {
+        double value;
+        if (i % 8 == 0) {
+          value = buffer[i / 8] << 4 | buffer[i / 8 + 1] >> 4;
+        } else {
+          value = (buffer[i / 8] & 0x0F) << 8 | buffer[i / 8 + 1];
         }
+        data.push_back(
+            (context_.r + value * pow(2, context_.e)) / pow(10, context_.d));
       }
 
       function_(context_, data);

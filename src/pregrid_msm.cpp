@@ -88,13 +88,9 @@ private:
   void read_msm_cb_(
       simpatico::msm_context const& context,
       std::vector<double> const& data) {
-
     if (context.forecast_time > 0) {
       return;
     }
-
-    boost::posix_time::ptime reference_time
-      = boost::posix_time::ptime_from_tm(context.reference_time);
 
     std::string hdate;
     {
@@ -103,19 +99,138 @@ private:
         = new boost::posix_time::time_facet();
       out.imbue(std::locale(out.getloc(), hdate_facet));
       hdate_facet->format("%Y-%m-%d_%H:%M:%S");
-      out << reference_time;
+      out << boost::posix_time::ptime_from_tm(context.reference_time);
       hdate = simpatico::pad(out.str(), 24);
     }
 
-    if (trace0_) {
-      *trace0_ << "hdate: " << hdate << "\n";
+    std::string field;
+    std::string units;
+    std::string desc;
+    switch (context.parameter_category) {
+      case 0:
+        switch (context.parameter_number) {
+          case 0: // Temperature [K]
+            field = "T";
+            units = "K";
+            desc = "T [K]";
+            break;
+        }
+        break;
+      case 1:
+        switch (context.parameter_number) {
+          case 1: // Relative humidity [%]
+            field = "RH";
+            units = "%";
+            desc = "RH [%]";
+            break;
+          case 8: // Total precipitation [kg/m^2]
+            break;
+        }
+        break;
+      case 2:
+        switch (context.parameter_number) {
+          case 2: // u-component of wind [m/s]
+            field = "U";
+            units = "m s{-1}";
+            desc = "U";
+            break;
+          case 3: // v-component of wind [m/s]
+            field = "V";
+            units = "m s{-1}";
+            desc = "V";
+            break;
+          case 8: // Vertical velocity (pressure) [Pa/s]
+            break;
+        }
+        break;
+      case 3:
+        switch (context.parameter_number) {
+          case 0: // Pressure [Pa]
+            field = "PRESSURE";
+            units = "Pa";
+            desc = "PRESSURE [Pa]";
+            break;
+          case 1: // Pressure reduced to MSL [Pa]
+            field = "PMSL";
+            units = "Pa";
+            desc = "PMSL [Pa]";
+            break;
+          case 5: // Geopotential height [gpm]
+            field = "HGT";
+            units = "m";
+            desc = "HGT [m]";
+            break;
+        }
+        break;
+      case 6:
+        switch (context.parameter_number) {
+          case 1: // Total cloud cover [%]
+            break;
+          case 3: // Low cloud cover [%]
+            break;
+          case 4: // Medium cloud cover [%]
+            break;
+          case 5: // High cloud cover [%]
+            break;
+        }
+        break;
     }
-  }
 
-  void write_pregrid_() {
+    if (field.empty()) {
+      return;
+    }
+    field = simpatico::pad(field, 9);
+    units = simpatico::pad(units, 25);
+    desc = simpatico::pad(desc, 46);
+
+    float xlvl = 200100;
+    if (context.surface_type == 100) {
+      xlvl = context.surface_value;
+    }
+
+    if (trace0_) {
+      *trace0_
+          << "hdate: " << hdate << "\n"
+          << "field: " << field << "\n"
+          << "units: " << units << "\n"
+          << "desc: " << desc << "\n"
+          << "xlvl: " << xlvl << "\n"
+          ;
+    }
+
     writer_.record_start();
     {
       writer_.write<int32_t>(3);
+    }
+    writer_.record_ended();
+
+    writer_.record_start();
+    {
+      writer_.write_string(hdate);
+      writer_.write<float>(0); // xcfst
+      writer_.write_string(field);
+      writer_.write_string(units);
+      writer_.write_string(desc);
+      writer_.write(xlvl);
+      writer_.write<int32_t>(context.n_i); // nx
+      writer_.write<int32_t>(context.n_j); // ny
+      writer_.write<int32_t>(0); // iproj
+    }
+    writer_.record_ended();
+
+    writer_.record_start();
+    {
+      writer_.write<float>(context.la_1); // startlat
+      writer_.write<float>(context.lo_1); // startlon
+      writer_.write<float>(-context.d_j); // deltalat
+      writer_.write<float>(context.d_i); // deltalon
+    }
+    writer_.record_ended();
+
+    size_t size = context.n_i * context.n_j;
+    writer_.record_start();
+    for (size_t i = 0; i < size; ++i) {
+      writer_.write<float>(data[i]);
     }
     writer_.record_ended();
   }
