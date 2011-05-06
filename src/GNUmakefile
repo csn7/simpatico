@@ -21,7 +21,7 @@ SOURCE = $(wildcard test_*.cpp)
 endif
 
 ifeq ($(MODE),main)
-SOURCE = pregrid_msm.cpp viewer.cpp
+SOURCE = pregrid_dailysst.cpp pregrid_msm.cpp viewer.cpp
 endif
 
 TARGET = $(SOURCE:.cpp=)
