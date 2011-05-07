@@ -17,10 +17,9 @@
 #include <boost/program_options/variables_map.hpp>
 #include <boost/xpressive/xpressive.hpp>
 #include "assert.hpp"
-#include "fortran_writer.hpp"
 #include "msm_context.hpp"
 #include "msm_reader.hpp"
-#include "pad.hpp"
+#include "pregrid_writer.hpp"
 
 class application : boost::noncopyable {
 public:
@@ -66,7 +65,7 @@ private:
   std::ostream* trace1_;
 
   std::ofstream out_;
-  simpatico::fortran_writer<> writer_;
+  simpatico::pregrid_writer writer_;
 
   void read_msm_(std::string const& path) {
     using boost::xpressive::eos;
@@ -86,9 +85,9 @@ private:
   }
 
   void read_msm_cb_(
-      simpatico::msm_context const& context,
+      simpatico::msm_context const& msm_context,
       std::vector<double> const& data) {
-    if (context.forecast_time > 0) {
+    if (msm_context.forecast_time > 0) {
       return;
     }
 
@@ -99,16 +98,16 @@ private:
         = new boost::posix_time::time_facet();
       out.imbue(std::locale(out.getloc(), hdate_facet));
       hdate_facet->format("%Y-%m-%d_%H:%M:%S");
-      out << boost::posix_time::ptime_from_tm(context.reference_time);
-      hdate = simpatico::pad(out.str(), 24);
+      out << boost::posix_time::ptime_from_tm(msm_context.reference_time);
+      hdate = out.str();
     }
 
     std::string field;
     std::string units;
     std::string desc;
-    switch (context.parameter_category) {
+    switch (msm_context.parameter_category) {
       case 0:
-        switch (context.parameter_number) {
+        switch (msm_context.parameter_number) {
           case 0: // Temperature [K]
             field = "T";
             units = "K";
@@ -117,7 +116,7 @@ private:
         }
         break;
       case 1:
-        switch (context.parameter_number) {
+        switch (msm_context.parameter_number) {
           case 1: // Relative humidity [%]
             field = "RH";
             units = "%";
@@ -128,7 +127,7 @@ private:
         }
         break;
       case 2:
-        switch (context.parameter_number) {
+        switch (msm_context.parameter_number) {
           case 2: // u-component of wind [m/s]
             field = "U";
             units = "m s{-1}";
@@ -144,7 +143,7 @@ private:
         }
         break;
       case 3:
-        switch (context.parameter_number) {
+        switch (msm_context.parameter_number) {
           case 0: // Pressure [Pa]
             field = "PRESSURE";
             units = "Pa";
@@ -163,7 +162,7 @@ private:
         }
         break;
       case 6:
-        switch (context.parameter_number) {
+        switch (msm_context.parameter_number) {
           case 1: // Total cloud cover [%]
             break;
           case 3: // Low cloud cover [%]
@@ -179,13 +178,10 @@ private:
     if (field.empty()) {
       return;
     }
-    field = simpatico::pad(field, 9);
-    units = simpatico::pad(units, 25);
-    desc = simpatico::pad(desc, 46);
 
-    float xlvl = 200100;
-    if (context.surface_type == 100) {
-      xlvl = context.surface_value;
+    float xlvl = simpatico::pregrid_context::surface();
+    if (msm_context.surface_type == 100) {
+      xlvl = msm_context.surface_value;
     }
 
     if (trace0_) {
@@ -194,40 +190,28 @@ private:
           << "field: " << field << "\n"
           << "units: " << units << "\n"
           << "desc: " << desc << "\n"
-          << "xlvl: " << xlvl << "\n"
-          ;
+          << "xlvl: " << xlvl << "\n";
     }
 
-    writer_.record_start();
-    {
-      writer_.write<int32_t>(3);
-    }
-    writer_.record_ended();
+    simpatico::pregrid_context pregrid_context = {
+      3,                // ifv
+      hdate,
+      0,                // xcfst
+      field,
+      units,
+      desc,
+      xlvl,
+      msm_context.n_i,  // nx
+      msm_context.n_j,  // ny
+      0,                // iproj
+      msm_context.la_1, // startlat
+      msm_context.lo_1, // startlon
+      -msm_context.d_j, // deltalat
+      msm_context.d_i,  // deltalon
+    };
+    writer_.write_context(pregrid_context);
 
-    writer_.record_start();
-    {
-      writer_.write_string(hdate);
-      writer_.write<float>(0); // xcfst
-      writer_.write_string(field);
-      writer_.write_string(units);
-      writer_.write_string(desc);
-      writer_.write(xlvl);
-      writer_.write<int32_t>(context.n_i); // nx
-      writer_.write<int32_t>(context.n_j); // ny
-      writer_.write<int32_t>(0); // iproj
-    }
-    writer_.record_ended();
-
-    writer_.record_start();
-    {
-      writer_.write<float>(context.la_1); // startlat
-      writer_.write<float>(context.lo_1); // startlon
-      writer_.write<float>(-context.d_j); // deltalat
-      writer_.write<float>(context.d_i); // deltalon
-    }
-    writer_.record_ended();
-
-    size_t size = context.n_i * context.n_j;
+    size_t size = msm_context.n_i * msm_context.n_j;
     writer_.record_start();
     for (size_t i = 0; i < size; ++i) {
       writer_.write<float>(data[i]);

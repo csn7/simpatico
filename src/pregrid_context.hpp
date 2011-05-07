@@ -25,6 +25,14 @@ namespace simpatico {
     float       xlonc;
     float       truelat1;
     float       truelat2;
+
+    static float sea_level() {
+      return 201300;
+    }
+
+    static float surface() {
+      return 200100;
+    }
   };
 }
 

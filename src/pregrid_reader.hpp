@@ -72,23 +72,21 @@ namespace simpatico {
       }
 
       reader_.record_start();
-      {
-        switch (context_.iproj) {
-          case 0:
-            read_cylindrical_equidistant_projection_();
-            break;
-          case 1:
-            read_mercator_projection_();
-            break;
-          case 3:
-            read_lambert_conformal_projection_();
-            break;
-          case 5:
-            read_polar_stereographic_projection_();
-            break;
-          default:
-            BOOST_ASSERT(! "Unknown projection");
-        }
+      switch (context_.iproj) {
+        case 0:
+          read_cylindrical_equidistant_projection_();
+          break;
+        case 1:
+          read_mercator_projection_();
+          break;
+        case 3:
+          read_lambert_conformal_projection_();
+          break;
+        case 5:
+          read_polar_stereographic_projection_();
+          break;
+        default:
+          BOOST_ASSERT(! "Unknown projection");
       }
       reader_.record_ended();
 
@@ -154,7 +152,7 @@ namespace simpatico {
       context_.deltalon = 0;
       context_.dx       = reader_.read<float>("dx");
       context_.dy       = reader_.read<float>("dy");
-      context_.xlonc    = 0;
+      context_.xlonc    = reader_.read<float>("xlonc");
       context_.truelat1 = reader_.read<float>("truelat1");
       context_.truelat2 = 0;
     }

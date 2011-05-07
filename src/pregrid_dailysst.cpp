@@ -1,8 +1,10 @@
 #include <exception>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <boost/bind.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -11,7 +13,9 @@
 #include <boost/program_options/variables_map.hpp>
 #include "dailysst_context.hpp"
 #include "dailysst_reader.hpp"
-#include "fortran_writer.hpp"
+#include "pregrid_context.hpp"
+#include "pregrid_writer.hpp"
+#include "vecmath.hpp"
 
 class application : boost::noncopyable {
 public:
@@ -51,11 +55,96 @@ private:
   std::ostream* trace_;
 
   std::ofstream out_;
-  simpatico::fortran_writer<> writer_;
+  simpatico::pregrid_writer writer_;
 
   void read_dailysst_cb_(
-      simpatico::dailysst_context const& context,
+      simpatico::dailysst_context const& dailysst_context,
       std::vector<int> const& data) {
+
+    std::string hdate;
+    {
+      std::ostringstream out;
+      boost::posix_time::time_facet* hdate_facet
+        = new boost::posix_time::time_facet();
+      out.imbue(std::locale(out.getloc(), hdate_facet));
+      hdate_facet->format("%Y-%m-%d_%H:%M:%S");
+      out << boost::posix_time::ptime_from_tm(dailysst_context.time);
+      hdate = out.str();
+    }
+
+    vm::Vector2d d(dailysst_context.ended);
+    d.sub(dailysst_context.start);
+    d.x /= dailysst_context.size.x;
+    d.y /= dailysst_context.size.y;
+
+    if (trace_) {
+      *trace_
+          << "hdate: " << hdate << "\n"
+          << "d: " << d << "\n";
+    }
+
+    simpatico::pregrid_context pregrid_context = {
+      3,
+      hdate,
+      0,
+      std::string(),
+      std::string(),
+      std::string(),
+      simpatico::pregrid_context::surface(),
+      dailysst_context.size.x,
+      dailysst_context.size.y,
+      0,
+      dailysst_context.start.y + d.y * 0.5,
+      dailysst_context.start.x + d.x * 0.5,
+      d.y,
+      d.x,
+    };
+
+    size_t size = dailysst_context.size.x * dailysst_context.size.y;
+
+    // LANDSEA
+    pregrid_context.field = "LANDSEA";
+    pregrid_context.units = "0/1 Flag";
+    pregrid_context.desc = "LANDSEA (0/1)";
+
+    writer_.write_context(pregrid_context);
+    writer_.record_start();
+    for (size_t i = 0; i < size; ++i) {
+      float value = data[i] == 999 ? 1 : 0;
+      writer_.write<float>(value);
+    }
+    writer_.record_ended();
+
+    // LANDSEA
+    pregrid_context.field = "SEAICE";
+    pregrid_context.units = "0/1 Flag";
+    pregrid_context.desc = "SEAICE (0/1)";
+
+    writer_.write_context(pregrid_context);
+    writer_.record_start();
+    for (size_t i = 0; i < size; ++i) {
+      float value = data[i] == 888 ? 1 : 0;
+      writer_.write<float>(value);
+    }
+    writer_.record_ended();
+
+    // SST [K]
+    pregrid_context.field = "SST";
+    pregrid_context.units = "K";
+    pregrid_context.desc = "SST [K]";
+
+    writer_.write_context(pregrid_context);
+    writer_.record_start();
+    for (size_t i = 0; i < size; ++i) {
+      float value;
+      if (data[i] == 777 || data[i] == 888 || data[i] == 999) {
+        value = 273;
+      } else {
+        value = data[i] * 0.1 + 273; // C => K
+      }
+      writer_.write<float>(value);
+    }
+    writer_.record_ended();
   }
 };
 
