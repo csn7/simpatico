@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <iostream>
 #include <string>
+#include <boost/iostreams/operations.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_fundamental.hpp>
@@ -18,7 +19,7 @@ namespace simpatico {
   class reader : boost::noncopyable {
   public:
     explicit reader(std::istream& in, std::ostream* trace = 0)
-      : in_(in), trace_(trace), position_() {}
+      : in_(in), trace_(trace), position_(), eof_() {}
 
     template <typename T>
     T read(char const* name = 0) {
@@ -79,11 +80,11 @@ namespace simpatico {
     }
 
     bool eof() const {
-      return in_.eof();
+      return eof_ || in_.eof();
     }
 
     size_t position() const {
-      // can not use peekg...
+      // can not use tellg...
       return position_;
     }
 
@@ -109,10 +110,15 @@ namespace simpatico {
     std::istream& in_;
     std::ostream* trace_;
     size_t position_;
+    bool eof_;
 
     void read_(char* buffer, size_t size) {
-      in_.read(buffer, size);
-      position_ += size;
+      std::streamsize read_size = boost::iostreams::read(in_, buffer, size);
+      if (read_size > 0) {
+        position_ += read_size;
+      } else {
+        eof_ = true;
+      }
     }
   };
 }

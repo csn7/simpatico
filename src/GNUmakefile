@@ -10,6 +10,7 @@ FLUID       = $(PREFIX)/bin/fluid
 
 LOADLIBES = \
 	$(shell $(FLTK_CONFIG) --use-gl --use-images --ldstaticflags) \
+	$(PREFIX)/lib/libexpat.a \
 	$(PREFIX)/lib/libboost_iostreams.a \
 	$(PREFIX)/lib/libboost_program_options.a \
 	$(PREFIX)/lib/libbz2_static.a
@@ -49,7 +50,7 @@ _postprocess:: viewer
 	for i in $^; do $(FLTK_CONFIG) --post $i || exit 1; done
 
 _test:: $(TARGET)
-	for i in $^; do ./$$i || exit 1; done
+	for i in $^; do echo $$i; ./$$i || exit 1; done
 
 _clean::
 	$(RM) $(TARGET)
