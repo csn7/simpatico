@@ -90,11 +90,9 @@ namespace simpatico {
 
     void skip(size_t size) {
       // can not use seekg...
-      if (size > 0) {
-        for (size_t i = 0; i < size; ++i) {
-          char c = 0;
-          read_(&c, 1);
-        }
+      for (size_t i = 0; i < size; ++i) {
+        char c = 0;
+        read_(&c, 1);
       }
 
       if (trace_) {
